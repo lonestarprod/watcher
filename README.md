@@ -146,7 +146,7 @@ step with `board stage <n> <value>`; the spawner sets Parked when it parks a car
 says who owns the card, Stage says what is happening to it. A board view grouped by Stage
 is the per-step column view; `board list` prints the stage as its fifth column.
 The watcher is one Claude Code plugin (`.claude-plugin/plugin.json`: `commands/`, `agents/` and the guard
-mod's hooks, card [#209](https://github.com/roloc/watcher/issues/209)). The spawner loads it with
+mod's hooks, card [#209](https://github.com/lonestarprod/watcher/issues/209)). The spawner loads it with
 `--plugin-dir "$WATCHER_HOME"` and runs `/watcher:watch <n>`, so a tick uses its own release's copy and the
 agents are `watcher:reviewer` and `watcher:usability`; a fork installs it with
 `/plugin install watcher --marketplace lonestarprod/watcher`. A project-level `.claude/commands/watch.md` is
@@ -159,7 +159,7 @@ worktree.
 ## The floor page
 
 **What every lane on the box is doing, without ssh or journalctl.** `bin/floor.py`
-(card [#40](https://github.com/roloc/watcher/issues/40)) is a small stdlib HTTP server,
+(card [#40](https://github.com/lonestarprod/watcher/issues/40)) is a small stdlib HTTP server,
 always on (`watcher-floor.service`), that groups every lane in `projects/*.env` by the
 board it works and shows one of five states per lane — working (the card, its Stage,
 minutes since launch), idle (why), needs the owner (the card and the first line of its ask),
@@ -321,7 +321,7 @@ silently. A docs-only PR that touches no part of the merge gate needs no receipt
 
 **Where it runs.** PR code is code any branch can write, so it never runs on a box that
 holds credentials — riffmap's split (its `ci.yml`, riffmap
-[#407](https://github.com/roloc/riffmap/issues/407)), which here rules out exactly one box:
+[#407](https://github.com/lonestarprod/riffmap/issues/407)), which here rules out exactly one box:
 the `agents` LXC this repo deploys to, holding the GitHub Apps' keys and a Claude
 subscription token. The repo variable `CI_RUNNER` picks the runner. It is **`watcher-ci`**
 (since September 28, 2026): the `ci-watcher` runner on the `ci` LXC (108), in
@@ -346,7 +346,7 @@ Deploying is deliberately not a CI job: it would need a runner on the agents box
 A tick is asked, in prose, never to force-push, never to push `main`, never to merge with
 `--admin`, never to touch the box's services or the deployed checkout
 (`docs/how-it-works.md`, "Hard rules for every agent"; this repo's `CLAUDE.md`). Since card
-[#204](https://github.com/roloc/watcher/issues/204) a second wall stands behind the prose:
+[#204](https://github.com/lonestarprod/watcher/issues/204) a second wall stands behind the prose:
 `mods/guard/`, a Claude Code mod (a plugin of function hooks) that `bin/spawn.sh` loads into
 every tick with `--plugin-dir "$WATCHER_HOME/mods/guard"`, and `bin/eval.sh` into every
 replay case. Its hooks answer the tool call before the command runs: a `git push --force`,
@@ -373,7 +373,7 @@ A refused command is one line in the tick's own session, where the floor page's 
 shows it like any other tool result.
 
 One more hook guards the owner's phone rather than the box (card
-[#210](https://github.com/roloc/watcher/issues/210)): a `gh issue comment` or `gh pr comment`
+[#210](https://github.com/lonestarprod/watcher/issues/210)): a `gh issue comment` or `gh pr comment`
 whose body opens with a `Needs @` line is read against the numbered rules of
 `docs/talking-to-the-owner.md` (bold ask first, at most 8 bullets, exactly one question,
 lettered options with one `(recommended)`, the reply line, no paths or backticks above the
@@ -391,7 +391,7 @@ cases. A mod that fails to load on a build that has the runtime is one line on t
 and its fail-closed handler; `claude plugin test mods/guard` runs its tests offline, no
 login needed, and CI runs both on a pinned build through `npx`.
 
-`mods/card-context/` (card [#213](https://github.com/roloc/watcher/issues/213)) is its own plugin (a plugin names one hooks module), loaded beside the watcher's by a second
+`mods/card-context/` (card [#213](https://github.com/lonestarprod/watcher/issues/213)) is its own plugin (a plugin names one hooks module), loaded beside the watcher's by a second
 `--plugin-dir` in `bin/spawn.sh` and `bin/eval.sh`, and adds one section at the end of the tick's system prompt: the card's title, then its
 comments newest first, then its body, headed "The card as it stands now; the owner's newest comment is the
 ask." It reads the card with `gh issue view` (REST) and a failed read leaves the prompt as it was, with one
@@ -400,7 +400,7 @@ startup, so the section is the card as it stood when the tick started; a comment
 seen by the next tick, not the next turn.** Because it changes what every tick reads, a commit touching
 `mods/card-context/` runs the replay suite before it deploys (`deploy/autodeploy.sh`, `EVAL_PATHS`).
 
-`mods/browse/` (card [#215](https://github.com/roloc/watcher/issues/215)) is a third plugin, loaded the same way. It registers one
+`mods/browse/` (card [#215](https://github.com/lonestarprod/watcher/issues/215)) is a third plugin, loaded the same way. It registers one
 tool, `mcp__browse__browse` (`command`: check, text or shot; `url`; `out` for a shot; optional `wait`), whose handler runs
 `python3 "$WATCHER_HOME/bin/browse.py"` and returns what it printed; a failing run comes back as text with its exit
 code. `bin/browse.py` is unchanged and still works from a shell, so a project without the mod loses nothing.
@@ -411,7 +411,7 @@ code. `bin/browse.py` is unchanged and still works from a shell, so a project wi
 The owner never sshes to the box, and the floor page answers the phone's questions. The
 questions a developer has while changing the watcher from another Claude session are
 different — *is the lane idle yet*, *what did the tick on #204 do with my change*, *show me
-the dry run* — and since card [#205](https://github.com/roloc/watcher/issues/205) the box
+the dry run* — and since card [#205](https://github.com/lonestarprod/watcher/issues/205) the box
 answers them itself: `watcher-desk.service` runs `bin/desk.sh`, which keeps a Claude Code
 Remote Control session open on the box, named `<box> desk`, in the owner's own sessions
 list on every device. Any of their sessions can open it or message it.
@@ -439,7 +439,7 @@ the allow list holds only two purpose-built wrappers (`bin/desk-read.sh` for the
 a dry run, `bin/floor-api.sh` for the floor service; each takes one fixed shape of
 argument) and pure readers (`cat`, `ls`, `grep`, `journalctl`, `systemctl status`, the
 `gh … view|list` reads). Everything else asks the owner, in the session, on their phone.
-Three review rounds on [#218](https://github.com/roloc/watcher/pull/218) found what a
+Three review rounds on [#218](https://github.com/lonestarprod/watcher/pull/218) found what a
 general tool on such a list can be bent into — `curl` to any host, `git log --output`
 writing chosen text, `uniq IN OUT` copying a file — and each came off the list. GitHub is
 reached only through `bin/desk-gh.sh`, which fixes the repository to one `owner/repo` on
@@ -484,13 +484,13 @@ author App: the timer runs `bin/hygiene-run.sh` outside a lane, without the `gh`
 its `PATH`, so it uses whatever `gh auth login` the `watcher` user holds — the same as the
 floor page, the detector and the deployer's own check-run read.) While a hygiene card
 is open the next sweep comments the fresh list on it instead of filing a second one. The
-same script runs on riffmap ([roloc/riffmap#711](https://github.com/roloc/riffmap/pull/711))
-and riffmap-site ([roloc/riffmap-site#54](https://github.com/roloc/riffmap-site/pull/54)) —
+same script runs on riffmap ([lonestarprod/riffmap#711](https://github.com/lonestarprod/riffmap/pull/711))
+and riffmap-site ([lonestarprod/riffmap-site#54](https://github.com/lonestarprod/riffmap-site/pull/54)) —
 still from each repo's own GitHub Actions workflow and `BOARD_TOKEN`, pending their own
 box-side move; the script itself is one script with each repo's paths either way.
 
 On the box the runner adds one section of the watcher's own to every project's sweep
-(card [#206](https://github.com/roloc/watcher/issues/206)): a project's
+(card [#206](https://github.com/lonestarprod/watcher/issues/206)): a project's
 `.claude/agents/reviewer.md` or `usability.md` that no longer matches the deployed
 watcher's `agents/` copy is a finding naming the file and the watcher commit it differs
 from. Those copies shadow the installed ones, and the watcher's `agents/` changes with no
@@ -699,7 +699,7 @@ environment until it is restarted. The check: a comment filed from a new session
 
 ## The owner pane in a desktop session
 
-`mods/owner-pane/` (card [#214](https://github.com/roloc/watcher/issues/214)) is for the owner's own Claude sessions on the Mac, not the box. Load it with
+`mods/owner-pane/` (card [#214](https://github.com/lonestarprod/watcher/issues/214)) is for the owner's own Claude sessions on the Mac, not the box. Load it with
 `claude --plugin-dir <checkout>/mods/owner-pane` (or `CLAUDE_CODE_PLUGIN_DIRS`). Settings (`/config`): the floor page URL, the
 checkout path (for `bin/board.py` and `projects/<name>.env`) and the default repository. The pane lists every Stuck card's question,
 each lane's pill and the deploy line, refreshed every minute from `/api/state.json`. `/stuck` lists the questions; `/stuck <n> <reply>`

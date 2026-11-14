@@ -92,7 +92,7 @@ above the fold (`docs/talking-to-the-owner.md` rule 8), and three bullets, which
 you touch a file, and before the Stage moves past `Claimed`.** The card is the one copy
 the owner can see, so a plan written only for the PR body and `reviewer`, with the owner
 told afterwards, leaves the card looking hung for however long the build takes (watcher
-[#98](https://github.com/roloc/watcher/issues/98), October 9, 2026: the card showed only
+[#98](https://github.com/lonestarprod/watcher/issues/98), October 9, 2026: the card showed only
 "picked this up" for 57 minutes while a tick built, tested and ran the replay suite, and
 the plan comment landed at 20:26 UTC — after the work was done). The file list is for the
 PR body and for `reviewer`, not for them:
@@ -136,7 +136,7 @@ the title alone will not tell you which. Then:
   question costs one letter. This is the rare case: most cards have one reading that
   lands where the asker is, and you build it without asking.
 
-(watcher [#63](https://github.com/roloc/watcher/issues/63), September 30, 2026: "Build a
+(watcher [#63](https://github.com/lonestarprod/watcher/issues/63), September 30, 2026: "Build a
 way to tail the log for a lane to see what each one is working on", body "see title". The
 tick shipped a command that runs on the box. Steve reads the floor page on his phone and
 does not ssh; he reopened the card to say so, and the second build is the one he had asked
@@ -168,7 +168,7 @@ then `Read` the file — the Read tool shows you a PNG. Say in one sentence what
 shows, and check that against the code before you accept the card's own explanation of
 the cause: the owner's diagnosis is a hypothesis, the picture and the code are the evidence.
 If they disagree, say so on the card and go to Stuck (§4) with what you saw — never build
-the fix for the wrong cause. (riffmap [#359](https://github.com/roloc/riffmap/issues/359),
+the fix for the wrong cause. (riffmap [#359](https://github.com/lonestarprod/riffmap/issues/359),
 September 16, 2026: the card said "too many topics"; the screenshot showed every arc as a
 dashed outline, the portal's designed "behind the pipeline" state the morning after a
 pipeline bump. The tick built a cap on topic count, and the ring came out worse.)
@@ -179,7 +179,7 @@ can hand you a URL or a file for. **Whether you *can* look is a question about a
 about effort**, so find out before you decide you cannot: the project's `CLAUDE.md` says
 what its data is and how a tick is allowed to read it, and a read-only capability link is
 the usual answer. A card that says *"this page is wrong"* is a card whose evidence is the
-page. (riffmap [#431](https://github.com/roloc/riffmap/issues/431), September 19, 2026: a
+page. (riffmap [#431](https://github.com/lonestarprod/riffmap/issues/431), September 19, 2026: a
 tick asked the owner which of two widgets they had seen on a specific meeting. The meeting
 was one fetch away — its data said neither widget could have drawn — so the question spent
 a day of the owner's attention on something the tick could have answered in a minute.)
@@ -215,7 +215,7 @@ change meanwhile. When the project's
 `CLAUDE.md` names its own screenshot script, that is still what makes the pictures a PR
 ships with (below); this is how you *look* — at a symptom before you decide what is wrong,
 and at the same page again before the card closes.
-(watcher [#71](https://github.com/roloc/watcher/issues/71), October 1, 2026: "nothing
+(watcher [#71](https://github.com/lonestarprod/watcher/issues/71), October 1, 2026: "nothing
 loads" on a page whose script did not parse. The tick fetched it five times, got five
 clean responses, and went to Stuck to ask what Steve had seen. A browser says "syntax
 error" on the first load.)
@@ -240,7 +240,7 @@ specific the words seemed. So, in this order:
    description, which was specific enough." A tick that reports it could not look and then
    ships anyway has turned an access gap into a design nobody checked.
 
-(riffmap [#453](https://github.com/roloc/riffmap/issues/453), September 21, 2026: the card
+(riffmap [#453](https://github.com/lonestarprod/riffmap/issues/453), September 21, 2026: the card
 linked the call to trim by its `/maps/…` URL. The architect tick hit the Google login, said
 so on the card, then merged a spec section and filed four build cards from the three
 sentences under the link. The meeting was one Share click away.)
@@ -255,7 +255,7 @@ cannot be traced to a sentence of the root, **say so on the card before you buil
 parent card's reasoning is a hypothesis exactly as the owner's diagnosis is, and the frame may
 have been set wrong upstream — every card after it inherits that. The root's complaint is
 the thing that has to be true at the end.
-(riffmap [#429](https://github.com/roloc/riffmap/issues/429), September 19, 2026: the root
+(riffmap [#429](https://github.com/lonestarprod/riffmap/issues/429), September 19, 2026: the root
 said a Friday 1-1 had the sales-call widgets in it. The architect read that as kind
 detection, wrote it into the spec, and four correct PRs shipped against that frame over the
 next six hours. What actually drew was gated somewhere else entirely, and nobody between
@@ -266,9 +266,9 @@ came off the same root (`gh issue list --search "<root number> in:body" --state 
 and read the titles: an architect often files a surface's build card before its mockup
 is approved. If one already covers the work, update that card's body to what was decided
 since — the approved mockup, the owner's reply — and link it; never file a second.
-(riffmap [#473](https://github.com/roloc/riffmap/issues/473), September 21, 2026: the tick
+(riffmap [#473](https://github.com/lonestarprod/riffmap/issues/473), September 21, 2026: the tick
 that merged the trim mockup filed the renderer build card that
-[#460](https://github.com/roloc/riffmap/issues/460) already was; the older one still
+[#460](https://github.com/lonestarprod/riffmap/issues/460) already was; the older one still
 carried the cost caption the owner had just ruled out.)
 
 **File it with `board file`, never a bare `gh issue create`.** `board file -R <owner/repo>
@@ -298,7 +298,7 @@ from a card's words, but it only ever sees a card with **no** `agent:` label, so
 you file with a label — which is most of them — is never triaged at all. The spawner
 reads an explicit `Depends on #<m>` out of the body as a net, but it is a regex over prose
 and it only guesses; you know.
-(riffmap [#447](https://github.com/roloc/riffmap/issues/447), September 20, 2026: one
+(riffmap [#447](https://github.com/lonestarprod/riffmap/issues/447), September 20, 2026: one
 architect tick filed three cards at 02:50, each one's body naming the one before it, none
 of them recorded. Thirteen hours later a renderer tick picked up the last of the three,
 spent its whole run establishing that the contract field it needed did not exist yet, and
@@ -317,8 +317,8 @@ parked in Stuck to ask the owner a question the card's own first line had alread
 - **Before you open a Stuck card, re-read the card that spawned this one.** The owner states
   their goal in the original ask far more often than they restate it later; if that goal
   already decides your question, it is decided — build it, and say on the card which
-  sentence you read it from. (riffmap [#429](https://github.com/roloc/riffmap/issues/429) →
-  [#431](https://github.com/roloc/riffmap/issues/431), September 19, 2026: the parent card
+  sentence you read it from. (riffmap [#429](https://github.com/lonestarprod/riffmap/issues/429) →
+  [#431](https://github.com/lonestarprod/riffmap/issues/431), September 19, 2026: the parent card
   said "the sales widgets should only show when it is a sales call", and the child card
   asked the owner whether a sales widget should show on a non-sales call.)
 
@@ -336,7 +336,7 @@ preview URLs where it has them) and says in one sentence what the chart now tell
 reader. If that sentence is "most of it is in one grey bucket", you have not fixed a
 chart, you have removed one: stop, and file the designer card instead. The `reviewer`
 treats a screen change with no picture as blocking. Tests, lint and a green build are
-not a look — they passed on [#359](https://github.com/roloc/riffmap/issues/359).
+not a look — they passed on [#359](https://github.com/lonestarprod/riffmap/issues/359).
 **A screen that runs code, in a project with no screenshot script of its own, is not
 exempt.** When what you are changing is a page's own script or a template with logic in it
 — not plain text or a document — and the project's `CLAUDE.md` names no way to render it,
@@ -345,7 +345,7 @@ and run `browse.py check` and `browse.py shot` on it (above): no errors, and a p
 have `Read`, are what the PR says in place of the project's own shots. Only a page you
 cannot serve at all, or a box with no browser, is Stuck. Never ship code that only runs in a browser and that no
 browser has run. (watcher
-[#70](https://github.com/roloc/watcher/pull/70), October 1, 2026: a page's script that did
+[#70](https://github.com/lonestarprod/watcher/pull/70), October 1, 2026: a page's script that did
 not parse merged with every check green, because every check read the source and none ran
 it. The page drew nothing.)
 
@@ -485,7 +485,7 @@ the owner. **Do not do those.** Go straight to Stuck with the options laid out (
     own `CLAUDE.md` names a job that must finish off this box, in its own time, before a
     merged fix is visible in the artifact — riffmap's `riffmap-rebuild.service`, kicked off
     by its deploy's own log lines after a merge, a pass over every meeting that can run for
-    hours (riffmap [#602](https://github.com/roloc/riffmap/issues/602), October 8, 2026:
+    hours (riffmap [#602](https://github.com/lonestarprod/riffmap/issues/602), October 8, 2026:
     32 meetings, 09:23Z to 14:43Z, re-polled inside one tick's own window until it parked in
     Stuck asking "should I keep checking back?"). When all three of these are true — the PR
     is merged, the project's required CI succeeded, and the deploy's own log shows that job
@@ -496,7 +496,7 @@ the owner. **Do not do those.** Go straight to Stuck with the options laid out (
     leave the card **In progress**; stop with `Outcome: awaiting rebuild`. The PR still says
     `Refs #<n>` and nothing else that names the card (above) — the card is not done, only
     unblocked from a wasted wait. The spawner skips a card carrying that label until it comes off — a project's own workflow
-    removes it (riffmap [#637](https://github.com/roloc/riffmap/issues/637)), or the spawner itself
+    removes it (riffmap [#637](https://github.com/lonestarprod/riffmap/issues/637)), or the spawner itself
     does, when the project's status command reports the rebuild finished (card #292) — then hands it
     to the next tick to re-check the artifact and close or park on what it now shows. Any
     other reason the artifact has not moved — the deploy is red, or its log shows no such
@@ -507,7 +507,7 @@ the owner. **Do not do those.** Go straight to Stuck with the options laid out (
   **root card**. A root whose children all closed green while its symptom survives is the
   exact shape this catches: if it survives, the root goes to **Stuck** (§4) with what
   shipped and what it still shows. A root card is not closed by its children being done.
-  (riffmap [#429](https://github.com/roloc/riffmap/issues/429), September 19, 2026: four
+  (riffmap [#429](https://github.com/lonestarprod/riffmap/issues/429), September 19, 2026: four
   merged PRs, every link green, and the meeting looked exactly the same at the end as it
   did in the sentence that started it.)
 - Wait for the project's **required CI check** (its `CLAUDE.md` names it) **in the
@@ -622,7 +622,7 @@ the owner. **Do not do those.** Go straight to Stuck with the options laid out (
   judgment** — a brief, a direction, a first mockup, nothing left to build — merge it on
   green before the card parks, rather than holding it open for their reply: an open PR is a
   branch two actors can collide on (the worktree-sync card on this board,
-  [#86](https://github.com/roloc/watcher/issues/86), has the incident). Its body carries
+  [#86](https://github.com/lonestarprod/watcher/issues/86), has the incident). Its body carries
   **`Refs #<n>`**, with no closing word next to the number anywhere in it (first bullet)
   — the card is not done until the owner answers, so
   it stays open the same way a symptom card does (above). Merge it, then go to **Stuck**
@@ -658,7 +658,7 @@ the owner. **Do not do those.** Go straight to Stuck with the options laid out (
   read anything else. Resume it — build it, see what the card still lacks, finish that —
   never start the card over. And leave your own run resumable the same way: **commit on
   the card branch each time the build goes green**, so the next run starts from a commit,
-  not from a guess. (riffmap [#458](https://github.com/roloc/riffmap/issues/458),
+  not from a guess. (riffmap [#458](https://github.com/lonestarprod/riffmap/issues/458),
   September 21, 2026: a run died with ~20 files staged and nothing committed; the retry,
   told to resume, merged it in 25 minutes.)
 - **A card that arrives with its PR already open** (the branch has commits, `gh pr list`
@@ -673,7 +673,7 @@ the owner. **Do not do those.** Go straight to Stuck with the options laid out (
 **Re-read the card, comments included, right before you ask.** `gh issue view <n> --json
 body,comments` again: the owner, or a session on their Mac, may have answered while you
 worked, and a question already answered on the card costs them a round trip for nothing. (riffmap
-[#454](https://github.com/roloc/riffmap/issues/454), September 21, 2026: a tick parked
+[#454](https://github.com/lonestarprod/riffmap/issues/454), September 21, 2026: a tick parked
 asking for a share link that had been put on the card eight minutes after it started.)
 
 **A stated lean is an answer.** A letter, or a preference stated in any words — "leaning
@@ -682,7 +682,7 @@ does not need a second round to confirm. If the reply carries a preference *and*
 request (evidence, a change, a further question), carry out the request as part of
 acting on the preference, and say on the card which sentence you read the choice from.
 Only a reply that is purely a question, with no preference anywhere in it, earns a second
-round. (riffmap-site [#1](https://github.com/roloc/riffmap-site/issues/1), October 8,
+round. (riffmap-site [#1](https://github.com/lonestarprod/riffmap-site/issues/1), October 8,
 2026: asked to pick a buyer, A, B or C, the owner wrote "I am leaning towards A and C first
 then eventually expanding into B but would love to know if there is intent and demand
 from either of those people first" — an answer with a request for evidence attached. The
@@ -727,7 +727,7 @@ gh issue comment <n> --body "🤖 FYI: your part is done — you said '<their se
 ```
 
 Parking the card on them again for the step their comment says is done is the loop
-fighting the owner. (riffmap [#778](https://github.com/roloc/riffmap/issues/778),
+fighting the owner. (riffmap [#778](https://github.com/lonestarprod/riffmap/issues/778),
 October 17, 2026: the owner minted the password and pushed the config, the live send
 failed, and he wrote "please just send a test mail with the credentials" four times in
 three hours; five ticks each read the body's Verification section — "only you can open

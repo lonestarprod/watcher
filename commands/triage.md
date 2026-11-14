@@ -51,7 +51,7 @@ carries the short table. Read those, then pick the ONE agent whose remit the car
   and the exact denial (`watch.md` §4). An `owner-decision` label does not change the
   route: once the owner's own comment says their part is done or asks for work, the card
   is ordinary work for the lane you label (`watch.md` §4 is where the label comes off).
-  (riffmap [#778](https://github.com/roloc/riffmap/issues/778), October 17, 2026: the
+  (riffmap [#778](https://github.com/lonestarprod/riffmap/issues/778), October 17, 2026: the
   owner had done his part, the live send had failed, and he wrote "please just send a test
   mail with the credentials" four times in three hours; five triage ticks each answered the
   body's Verification section — "only you can open the admin page and read your inbox" —
@@ -75,7 +75,7 @@ carries the short table. Read those, then pick the ONE agent whose remit the car
   app belongs to the web agent (riffmap: `ui`, whose self-check is screenshots), a chart
   on the rendered meeting page to the renderer (riffmap: `renderer`, whose self-check is
   a byte-exact render). Read where the screenshot was taken. (riffmap
-  [#359](https://github.com/roloc/riffmap/issues/359), September 16, 2026: a broken
+  [#359](https://github.com/lonestarprod/riffmap/issues/359), September 16, 2026: a broken
   ring on the portal's overview was labeled `renderer` because the card said "graph";
   that persona never runs the portal's shots, and the fix shipped unseen.)
 - A card that is both ("the display is bad *and* the link is broken") goes to design;

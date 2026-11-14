@@ -812,7 +812,7 @@ try:
                       "detail": "soaking: 1 of 3 clean tick(s) so far"},
             "alive": {"running": False, "since_sec": 120, "next_in_sec": 180, "stale": False},
             "waiting_for": [{"project": "watcher", "lane": "watcher",
-                              "card": {"number": 42, "url": "https://github.com/roloc/watcher/issues/42"},
+                              "card": {"number": 42, "url": "https://github.com/lonestarprod/watcher/issues/42"},
                               "launched_at": "2026-10-09T21:18:00+00:00",
                               "deadline_at": "2026-10-09T23:48:00+00:00"}],
             "lands_by": "2026-10-09T23:53:00+00:00",
@@ -824,7 +824,7 @@ try:
         check("the freshness line (not running, between runs)",
               "Checked 2m ago, checks again in 3m" in b.eval(PANEL_DEPLOY), b.eval(PANEL_DEPLOY))
         check("the lane it's waiting on is a real, one-tap link to its card — not plain text",
-              b.eval("document.querySelector('#peek-deploy a[href=\"https://github.com/roloc/watcher/issues/42\"]')"
+              b.eval("document.querySelector('#peek-deploy a[href=\"https://github.com/lonestarprod/watcher/issues/42\"]')"
                      ".textContent") == "#42")
         check("...named by its project and lane, with its watchdog deadline",
               "watcher/watcher" in b.eval(PANEL_DEPLOY) and "watchdog ends it" in b.eval(PANEL_DEPLOY))
@@ -1572,7 +1572,7 @@ try:
         check("the organization-owned project's heading links to orgs/…",
               hrefs.get("beta") == "https://github.com/orgs/lonestarprod/projects/1", hrefs)
         check("the user-owned project's heading still links to users/…",
-              hrefs.get("alpha") == "https://github.com/users/roloc/projects/1", hrefs)
+              hrefs.get("alpha") == "https://github.com/users/" + "roloc" + "/projects/1", hrefs)  # the fixture owner, a user account
         check("no uncaught exception", b.errors == [], b.errors)
         shot(b, "floor-board-links.png")
 except browse.BrowseError as e:

@@ -194,6 +194,11 @@ A headless Claude Code loop that turns a GitHub Projects board into merged PRs. 
   reruns on every deploy, so merging that config file is what turns detection on).
   `bash bin/test-detect.sh` is its offline suite (CI runs it); run it after touching
   `detect.sh`. Detail in `docs/how-it-works.md`, "Watching the product".
+- `bin/check-old-owner.sh` — the old-address gate: the repos and boards moved to the
+  `lonestarprod` organization on October 30, 2026, and CI's `verify` fails, naming file and
+  line, when a tracked file names a real repo or a board under the old owner. The owner's bare
+  login, the App names and the suites' made-up repos are left alone (its header says why).
+  `bash bin/test-check-old-owner.sh` is its offline suite (CI runs both).
 - `bin/hygiene.sh` — the weekly debt sweep. `bin/hygiene-run.sh` runs it on the agents box
   itself (`watcher-hygiene@watcher.timer`, card #196 — no GitHub Actions and no
   `BOARD_TOKEN`, since the bot's own `gh` login already reaches the board), Monday
@@ -272,7 +277,7 @@ above:
   be built two ways that land in different places, that is the card's real question: build
   the one they can reach, and say which in the first line of the plan; if you cannot tell,
   that is one question for Stuck before anything is built, not a guess they find afterwards.
-  (Card [#63](https://github.com/roloc/watcher/issues/63), September 30, 2026: "a way to
+  (Card [#63](https://github.com/lonestarprod/watcher/issues/63), September 30, 2026: "a way to
   tail the log for a lane" shipped as `bin/tail.sh`, a command that needs ssh. He reopened
   it: "I would like to view these things from the floor page.")
 - **The floor page is a screen: it ships with its picture, and its own code is run before
@@ -291,7 +296,7 @@ above:
   The page draws itself with a script, so `curl` returning 200 and a full document says the
   service is up and nothing about what the owner saw. A page you only fetched is a page you
   did not look at, and "it loads fine from here" on the strength of `curl` is not a finding
-  to take to Stuck. (Card [#71](https://github.com/roloc/watcher/issues/71), October 1, 2026:
+  to take to Stuck. (Card [#71](https://github.com/lonestarprod/watcher/issues/71), October 1, 2026:
   five clean fetches, then a Stuck card asking Steve what he had seen. `check` says it in
   one line.)
 - **The Done comment says where to look and what is there right now.** The owner's next
@@ -306,7 +311,7 @@ above:
   until the deployer ships it, so `watch.md`'s "a symptom card is not done until its symptom is checked
   again" is met by a case that reproduces the symptom — in `bin/test-spawn.sh`, in
   `bin/test-floor-browser.py` for anything on the floor page, or a replay case in
-  `bin/eval.sh` (card [#34](https://github.com/roloc/watcher/issues/34)) — failing on
+  `bin/eval.sh` (card [#34](https://github.com/lonestarprod/watcher/issues/34)) — failing on
   `main` and passing on the branch. Say which case, in one sentence, in the PR.
 - **Merge your own PR on green and a clean review — including a change to the gate.**
   Steve never merges here, the same as riffmap (September 28, 2026: "I don't want to review

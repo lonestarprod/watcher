@@ -18,7 +18,7 @@ gh issue view <n> -R lonestarprod/watcher --json title,state,labels,body,comment
 
 - **The ask is the body's first line** — unless the owner commented later. **The owner's
   newest comment outranks the body** (watcher
-  [#185](https://github.com/roloc/watcher/pull/185), October 17, 2026: five ticks answered
+  [#185](https://github.com/lonestarprod/watcher/pull/185), October 17, 2026: five ticks answered
   the body and repeated a park he had already rejected). Read the comments before deciding
   what the card wants.
 - **Several identities act on this board, and only one is the owner.** `roloc` is the owner's
@@ -56,7 +56,7 @@ set -a; source projects/watcher.env; set +a; python3 bin/board.py show <n>
 
 Never list the whole board to find one card — `gh issue view --json projectItems` is
 cheap, `gh project item-list` is what blew the GraphQL budget on October 8 and 9, 2026
-([#114](https://github.com/roloc/watcher/issues/114)).
+([#114](https://github.com/lonestarprod/watcher/issues/114)).
 
 ## Filing a card ("file a card for this")
 
@@ -121,8 +121,8 @@ Priority is the board's **Priority** field (P0–P2), not a label.
 
 ### The body
 
-The owner's own cards are the house shape — [#182](https://github.com/roloc/watcher/issues/182)
-and [#179](https://github.com/roloc/watcher/issues/179) are full examples:
+The owner's own cards are the house shape — [#182](https://github.com/lonestarprod/watcher/issues/182)
+and [#179](https://github.com/lonestarprod/watcher/issues/179) are full examples:
 
 1. **`**Ask:**`** — one line, bold, what ships. The first line is the ask, always.
 2. **`## Why now`** — the incident, the reading, the thing the owner saw, with the date.

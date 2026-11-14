@@ -4,7 +4,7 @@
 # "lonestar-web is staging"). Pinned to that LAN address but sent with RiffMap's own
 # hostname: the box's default vhost answers any unmatched Host: header with a different
 # app (Azeroth Rewind), so a plain probe of the IP was Azeroth answering, never RiffMap
-# (roloc/watcher#36, Steve, September 28, 2026). That hostname is `app.riffmap.ai` since
+# (lonestarprod/watcher#36, Steve, September 28, 2026). That hostname is `app.riffmap.ai` since
 # riffmap's cutover on October 30, 2026 (riffmap card #816, PR #817): the old
 # `riffmap.lonestarprod.com` vhost on the same box now answers every request with a 308 to
 # the new one, which this probe reads as "not up" — twelve readings of that filed riffmap

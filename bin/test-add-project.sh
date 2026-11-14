@@ -167,9 +167,10 @@ check "next steps: the sed fills the repo, owner and number" out_has "s|<owner/r
 for ph in '<owner/repo>' '<board owner>' '<board number>' '<owner login>'; do
   check "templates/board.md carries the placeholder $ph" grep -qF -- "$ph" "$HERE/../templates/board.md"
 done
-# A forker fills in their own board; the only roloc the template may name is the upstream
-# watcher repo itself (a card link), never a board or a login as the filled-in default.
-no_owner_default() { ! grep -oE 'roloc/[A-Za-z0-9_.-]+|Needs @[a-z]' "$HERE/../templates/board.md" | grep -vqE '^roloc/watcher$'; }
+# A forker fills in their own board; the template names the upstream watcher repo
+# (lonestarprod/watcher, a card link) and nothing under the old owner: never a board or a
+# login as the filled-in default.
+no_owner_default() { ! grep -qE 'roloc/[A-Za-z0-9_.-]+|Needs @[a-z]' "$HERE/../templates/board.md"; }
 check "templates/board.md names nobody's board or login as a default" no_owner_default
 
 # 6. BOT_LOGIN unset (card #272): the Apps path. No collaborator call, no board-access ask,

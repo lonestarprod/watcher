@@ -129,7 +129,7 @@ install_desk() {
       || { echo "warning: could not create the watcher-desk user; no desk on this box" >&2; return 1; }
   fi
   # The home, the desk folder and everything root puts in them (review of
-  # roloc/watcher#218, three rounds): the allow and deny lists are what make the desk
+  # lonestarprod/watcher#218, three rounds): the allow and deny lists are what make the desk
   # read-only, so nothing running as watcher-desk may rewrite them, drop a
   # settings.local.json beside them, OR rename the folder that holds them away and start a
   # fresh one. A root-owned directory with the sticky bit and group write (1775,

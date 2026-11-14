@@ -27,10 +27,10 @@ function engine(on: any, floorOk = true, ghFails = false) {
     const cmd = e.argv.join(' ')
     ran.push({ cmd, stdin: e.init?.stdin })
     if (ghFails) return { value: { exitCode: 1, stdout: '', stderr: 'boom', ...R } }
-    if (cmd.startsWith('gh issue create')) return { value: { exitCode: 0, stdout: 'https://github.com/roloc/watcher/issues/300\n', ...R } }
+    if (cmd.startsWith('gh issue create')) return { value: { exitCode: 0, stdout: 'https://github.com/lonestarprod/watcher/issues/300\n', ...R } }
     if (cmd.includes('--json projectItems')) return { value: { exitCode: 0, stdout: 'Backlog\n', ...R } }
     if (cmd.startsWith('gh issue view')) return { value: { exitCode: 0, stdout: JSON.stringify({ title: 'A card', state: 'OPEN', labels: [{ name: 'in-flight' }], projectItems: [{ status: { name: 'Stuck - Needs help' } }], comments: [{ author: { login: 'bot' }, createdAt: '2026-10-30T10:00:00Z', body: 'old' }, { author: { login: 'roloc' }, createdAt: '2026-10-30T12:00:00Z', body: 'newest one' }] }), ...R } }
-    if (cmd.startsWith('gh pr list')) return { value: { exitCode: 0, stdout: '[{"number":9,"state":"MERGED","url":"https://github.com/roloc/watcher/pull/9"}]', ...R } }
+    if (cmd.startsWith('gh pr list')) return { value: { exitCode: 0, stdout: '[{"number":9,"state":"MERGED","url":"https://github.com/lonestarprod/watcher/pull/9"}]', ...R } }
     return { value: { exitCode: 0, stdout: '', ...R } }
   })
   return ran
@@ -38,7 +38,7 @@ function engine(on: any, floorOk = true, ghFails = false) {
 
 test('the helpers cut the floor page down to rows', () => {
   const s = fromState(JSON.parse(STATE), 'now')
-  expect(s.stuck).toEqual([{ project: 'watcher', number: 213, url: 'https://github.com/roloc/watcher/issues/213', ask: 'is the note at tick start enough?' }])
+  expect(s.stuck).toEqual([{ project: 'watcher', number: 213, url: 'https://github.com/lonestarprod/watcher/issues/213', ask: 'is the note at tick start enough?' }])
   expect(s.lanes.map((l) => l.pill)).toEqual(['needs_steve', 'idle'])
   expect(s.ship).toBe('/opt/watcher runs b6a9eb8; deploy held at debdfad')
   expect(oneLine('**Needs @roloc: a b?**')).toBe('a b?')
@@ -64,7 +64,7 @@ test('a card number in the pane is a link to the card, on a lane and on a Needs-
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({ ...PANE, surface })
     const links = await ui.findAll({ type: 'Link' })
-    expect(links.map((l: any) => l.props.href)).toEqual(['https://github.com/roloc/watcher/issues/213', 'https://github.com/roloc/watcher/issues/213'])
+    expect(links.map((l: any) => l.props.href)).toEqual(['https://github.com/lonestarprod/watcher/issues/213', 'https://github.com/lonestarprod/watcher/issues/213'])
     await ui.unmount()
   }
 })
@@ -84,7 +84,7 @@ test('/stuck lists the question; /stuck <n> <letter> posts the comment and then 
   expect(ran).toEqual([])
   const done = await $.command.run({ command: 'stuck', args: '213 A' })
   expect(done.text).toBe('Posted on #213 and moved it to In progress.')
-  expect(ran[0].cmd).toBe('gh issue comment 213 -R roloc/watcher --body A')
+  expect(ran[0].cmd).toBe('gh issue comment 213 -R lonestarprod/watcher --body A')
   expect(ran[1].cmd).toContain('/home/me/projects/watcher/projects/watcher.env')
   expect(ran[1].cmd).toContain('/home/me/projects/watcher/bin/board.py 213')
   expect(ran.length).toBe(2)
@@ -113,8 +113,8 @@ test('/file-card drafts first and files only after a yes', async ($, on) => {
   expect(d.text).toContain('nothing filed yet')
   expect(ran).toEqual([])
   const f = await $.command.run({ command: 'file-card', args: 'yes' })
-  expect(f.text).toBe('Filed https://github.com/roloc/watcher/issues/300: on the board in Backlog.')
-  expect(ran[0].cmd).toContain('gh issue create -R roloc/watcher --title Show lane cost on the floor page')
+  expect(f.text).toBe('Filed https://github.com/lonestarprod/watcher/issues/300: on the board in Backlog.')
+  expect(ran[0].cmd).toContain('gh issue create -R lonestarprod/watcher --title Show lane cost on the floor page')
   expect(ran[0].stdin).toContain('**Ask:** show it.')
   expect((await $.command.run({ command: 'file-card', args: 'yes' })).text).toContain('no draft waiting')
 })
