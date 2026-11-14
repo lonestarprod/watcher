@@ -43,7 +43,7 @@ test('the helpers read the card, the PR and the receipt line', () => {
   expect(cardFromPrompt('/watch 211')).toBe('211')
   expect(cardFromPrompt('/watcher:watch #12')).toBe('12')
   expect(cardFromPrompt('please /watch 211')).toBeUndefined()
-  expect(prFromCreate('https://github.com/roloc/watcher/pull/230\n')).toBe('230')
+  expect(prFromCreate('https://github.com/lonestarprod/watcher/pull/230\n')).toBe('230')
   expect(prFromCreate('nothing')).toBeUndefined()
   expect(receiptLine(`${CLEAN}\n\nmore`, 'reviewer')).toBe(CLEAN)
   expect(receiptLine(`Reviewed abc: no blocking findings`, 'reviewer')).toBeUndefined()
@@ -53,7 +53,7 @@ test('the helpers read the card, the PR and the receipt line', () => {
 
 test('a gh pr create that succeeded sets the Stage PR open', async ($, on) => {
   const ran = engine(on)
-  withResult(on, { stdout: 'https://github.com/roloc/watcher/pull/230\n', stderr: '' })
+  withResult(on, { stdout: 'https://github.com/lonestarprod/watcher/pull/230\n', stderr: '' })
   await $.session.start({ cwd: WORKTREE, surface: null, isInteractive: false })
   await $.prompt.submit({ text: '/watch 211' }).catch(() => undefined)
   const r = await $.tool.call({ tool: 'Bash', command: 'gh pr create --title t --body-file b.md' })
@@ -144,7 +144,7 @@ test('a usability line from before the PR exists is held and posted when the PR 
     const bad = cmd.startsWith('gh pr view')
     return { value: { exitCode: bad ? 1 : 0, stdout: cmd.startsWith('git rev-parse') ? 'card-211' : '', stderr: '', isStdoutTruncated: false, isStderrTruncated: false } }
   })
-  on('tool.call', (_, e) => ({ result: e.tool === 'Agent' ? agentResult(USABILITY) : { stdout: 'https://github.com/roloc/watcher/pull/230\n', stderr: '' } }))
+  on('tool.call', (_, e) => ({ result: e.tool === 'Agent' ? agentResult(USABILITY) : { stdout: 'https://github.com/lonestarprod/watcher/pull/230\n', stderr: '' } }))
   await $.session.start({ cwd: WORKTREE, surface: null, isInteractive: false })
   await $.tool.call({ tool: 'Agent', description: 'u', prompt: 'p', subagent_type: 'watcher:usability' })
   expect(ran.filter((c) => c.startsWith('gh pr comment'))).toEqual([])

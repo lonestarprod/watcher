@@ -68,7 +68,7 @@ BOARD_OWNER=<board owner> BOARD_NUMBER=<board number> python3 "$WATCHER_HOME/bin
 
 Never list the whole board to find one card — `gh issue view --json projectItems` is
 cheap, `gh project item-list` is what blew a whole hour's GraphQL budget once (watcher
-[#114](https://github.com/roloc/watcher/issues/114)).
+[#114](https://github.com/lonestarprod/watcher/issues/114)).
 
 ## Filing a card ("file a card for this")
 

@@ -2,7 +2,7 @@
   "name": "owner-pane",
   "version": "0.1.0",
   "description": "The owner's desktop-session pane: Stuck cards and each lane's pill from the floor page, with /stuck, /card and /file-card.",
-  "author": { "name": "roloc/watcher" },
+  "author": { "name": "lonestarprod/watcher" },
   "types": "./types/index.d.ts",
   "userConfig": {
     "floorUrl": {
@@ -21,7 +21,7 @@
       "type": "string",
       "title": "Default repository",
       "description": "owner/name that /card and /file-card use when no repository is typed.",
-      "default": "roloc/watcher"
+      "default": "lonestarprod/watcher"
     }
   }
 }

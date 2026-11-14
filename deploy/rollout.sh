@@ -20,7 +20,7 @@
 # What it does, in order:
 #   1. The replay suite (bin/eval.sh), in a scratch clone at the exact target commit —
 #      before anything on the box changes. `EVAL_SKIP=1 deploy/rollout.sh …` skips it (a
-#      live suite has flakes, roloc/watcher#44).
+#      live suite has flakes, lonestarprod/watcher#44).
 #   2. Clones that commit into its own folder under $RELEASES_DIR (the same release a
 #      matching autodeploy.sh run would make — reused as-is if one already exists), runs
 #      that folder's own install.sh for the named project, and flips the pointer onto it.

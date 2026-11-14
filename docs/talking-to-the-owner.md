@@ -56,7 +56,7 @@ comment, a log line). Those can be as dense as they need to be.
    bar of who talked when", not "the talk ribbon". If a name cannot be avoided, describe it
    first and put the name in brackets after. **Asking them to choose between two things
    they have no name for is asking them nothing at all** (riffmap
-   [#431](https://github.com/roloc/riffmap/issues/431), September 19, 2026: a card asked
+   [#431](https://github.com/lonestarprod/riffmap/issues/431), September 19, 2026: a card asked
    whether the owner had seen "the ruler" or "the ribbon"; their answer was that there is
    nothing called a ribbon on that page. Both are real names in `template.html`. Neither is
    a name a reader has).

@@ -55,7 +55,7 @@ write_env("watcher", """\
 PROJECT_NAME=watcher
 PROJECT_ROOT=/x
 BOARD_OWNER=roloc
-PROJECT_REPO=roloc/watcher
+PROJECT_REPO=lonestarprod/watcher
 BOARD_NUMBER=2
 """)
 
@@ -63,7 +63,7 @@ write_env("riffmap", """\
 PROJECT_NAME=riffmap
 PROJECT_ROOT=/x
 BOARD_OWNER=roloc
-PROJECT_REPO=roloc/riffmap
+PROJECT_REPO=lonestarprod/riffmap
 BOARD_NUMBER=1
 DESIGN_AGENTS=architect,designer
 LANE_AGENTS="!${DESIGN_AGENTS},-"
@@ -124,7 +124,7 @@ check("riffmap's LANE_AGENTS keeps the interpolated ! form",
       by_name["riffmap"]["lane_agents"] == "!architect,designer,-",
       by_name["riffmap"]["lane_agents"])
 check("riffmap-triage's PROJECT_REPO came from the sourced file, not left blank",
-      by_name["riffmap-triage"]["project_repo"] == "roloc/riffmap")
+      by_name["riffmap-triage"]["project_repo"] == "lonestarprod/riffmap")
 check("watcher's LANE_AGENTS is empty (no LANE_AGENTS line): unset, not the string 'None'",
       by_name["watcher"]["lane_agents"] == "")
 
@@ -153,18 +153,20 @@ check("five projects (watcher, riffmap, second, third, fourth)",
 check("riffmap's board holds all three of its lanes",
       sorted(l["lane"] for l in by_pname["riffmap"]["lanes"])
       == ["riffmap", "riffmap-design", "riffmap-triage"])
+# The fixture lanes' board owner is a user account, so its board's address is the users/ form.
+USER_BOARD = f"https://github.com/users/{by_pname['riffmap']['board_owner']}/projects/1"
 check("board_url, with no address known, is the user form of owner/number (the fallback)",
-      by_pname["riffmap"]["board_url"] == "https://github.com/users/roloc/projects/1")
+      by_pname["riffmap"]["board_url"] == USER_BOARD)
 # Card #265: the board says where it lives. An organization-owned board links to orgs/, a
 # user-owned one (or one whose cache has no address yet) to users/.
 BOARD_URLS = {("roloc", 2): "https://github.com/orgs/lonestarprod/projects/1",
-              ("roloc", 1): "https://github.com/users/roloc/projects/1"}
+              ("roloc", 1): USER_BOARD}
 by_known = {p["name"]: p for p in floor.group_by_project(lanes, lambda o, n: BOARD_URLS.get((o, n), ""))}
 check("an organization-owned fixture board links to orgs/…",
       by_known["watcher"]["board_url"] == "https://github.com/orgs/lonestarprod/projects/1",
       by_known["watcher"]["board_url"])
 check("a user-owned fixture board still links to users/…",
-      by_known["riffmap"]["board_url"] == "https://github.com/users/roloc/projects/1")
+      by_known["riffmap"]["board_url"] == USER_BOARD)
 check("a board with no address cached falls back to users/…",
       by_known["second"]["board_url"] == f"https://github.com/users/{by_known['second']['board_owner']}/projects/{by_known['second']['board_number']}")
 
@@ -251,20 +253,20 @@ by_name["fourth"]["state_dir"] = fourth_dir
 
 BOARDS = {
     ("roloc", 1): [  # riffmap: build lane's card, and the card the triage lane parked
-        {"number": 501, "title": "fix the thing", "url": "https://github.com/roloc/riffmap/issues/501",
+        {"number": 501, "title": "fix the thing", "url": "https://github.com/lonestarprod/riffmap/issues/501",
          "state": "OPEN", "labels": [], "status": "In progress", "priority": "P1", "stage": "Building"},
-        {"number": 777, "title": "ambiguous mockup", "url": "https://github.com/roloc/riffmap/issues/777",
+        {"number": 777, "title": "ambiguous mockup", "url": "https://github.com/lonestarprod/riffmap/issues/777",
          "state": "OPEN", "labels": [], "status": "Stuck - Needs help", "priority": "P2", "stage": "Parked"},
         # a second Stuck card no lane's own last tick points at — the design lane ran this
         # one earlier and moved on to #777 since (card #96's "why nothing shows today"):
         # #778 must still show up on the board's own Needs Steve strip.
-        {"number": 778, "title": "an earlier pick, still unanswered", "url": "https://github.com/roloc/riffmap/issues/778",
+        {"number": 778, "title": "an earlier pick, still unanswered", "url": "https://github.com/lonestarprod/riffmap/issues/778",
          "state": "OPEN", "labels": ["holds up 8 cards"], "status": "Stuck - Needs help", "priority": "P2", "stage": "Parked"},
-        {"number": 900, "title": "in ready", "url": "https://github.com/roloc/riffmap/issues/900",
+        {"number": 900, "title": "in ready", "url": "https://github.com/lonestarprod/riffmap/issues/900",
          "state": "OPEN", "labels": [], "status": "Backlog", "priority": "P2", "stage": None},
     ],
     ("roloc", 2): [  # watcher's own board — empty, paused lane doesn't need it
-        {"number": 40, "title": "the floor page", "url": "https://github.com/roloc/watcher/issues/40",
+        {"number": 40, "title": "the floor page", "url": "https://github.com/lonestarprod/watcher/issues/40",
          "state": "OPEN", "labels": [], "status": "In progress", "priority": "P2", "stage": "Building"},
     ],
     ("roloc", 3): [  # second: one card sitting in Ready, matching its (unset) LANE_AGENTS
@@ -339,7 +341,7 @@ d = lanes_by_name[("riffmap", "riffmap")]
 check("riffmap (build): working", d["pill"] == "working", d)
 check("riffmap: card #501, its board Stage, ~17 minutes", d["card"]["number"] == 501
       and d["stage"] == "Building" and 16 <= d["minutes"] <= 18, d)
-check("riffmap: links straight to the card", d["link"] == "https://github.com/roloc/riffmap/issues/501")
+check("riffmap: links straight to the card", d["link"] == "https://github.com/lonestarprod/riffmap/issues/501")
 check("riffmap: unit_active reported True", d.get("unit_active") is True)
 check("card #110: a PAUSE file beside a held card never flips the pill — still working",
       d["pill"] == "working" and d.get("pausing") is True, d)
@@ -348,7 +350,7 @@ check("card #110: the pausing reason is the PAUSE file's own first line",
 check("card #103: 17 minutes in, no plan comment on file — plan_posted False, plan_late True",
       d.get("plan_posted") is False and d.get("plan_late") is True, d)
 check("the plan lookup was resolved against riffmap's OWN repo, not whatever repo this "
-      "process happens to run in", (501, "roloc/riffmap") in PLAN_CALLS, PLAN_CALLS)
+      "process happens to run in", (501, "lonestarprod/riffmap") in PLAN_CALLS, PLAN_CALLS)
 
 d = lanes_by_name[("watcher", "watcher")]
 check("card #110: a PAUSE file with no card held is still a plain paused desk, no pausing flag",
@@ -367,12 +369,12 @@ check("riffmap-triage: card #777 and the ask from board.py's own comment reader"
       d["card"]["number"] == 777 and "which of two mockups" in d["ask"], d)
 check("the ask was resolved against riffmap-triage's OWN repo, not whatever repo "
       "this process happens to run in — several projects share one box (review finding)",
-      (777, "roloc/riffmap") in ASK_CALLS, ASK_CALLS)
+      (777, "lonestarprod/riffmap") in ASK_CALLS, ASK_CALLS)
 check("riffmap-triage: the mockups its own Stuck comment pointed at, shown without a click "
       "through to the card (card #91)", d["images"] == ["https://example.com/mockup-a.png",
       "https://example.com/mockup-b.png"], d["images"])
 check("the images lookup was resolved against riffmap-triage's OWN repo too",
-      (777, "roloc/riffmap") in IMAGES_CALLS, IMAGES_CALLS)
+      (777, "lonestarprod/riffmap") in IMAGES_CALLS, IMAGES_CALLS)
 
 d = lanes_by_name[("second", "second")]
 check("second: idle, something of its own sitting in Ready",
@@ -658,7 +660,7 @@ check("card #244: #778 wears `holds up 8 cards` on the board, so its strip entry
 check("...and a Stuck card with no such chip reads 0, never a missing key",
       s777["holds_up"] == 0, s777)
 check("the rounds lookup was resolved against riffmap's OWN repo",
-      (778, "roloc/riffmap") in ROUNDS_CALLS, ROUNDS_CALLS)
+      (778, "lonestarprod/riffmap") in ROUNDS_CALLS, ROUNDS_CALLS)
 fourth_proj = next(p for p in state["projects"] if p["name"] == "fourth")
 check("fourth's own Stuck card shows up on its own strip too",
       [s["card"]["number"] for s in fourth_proj["stuck"]] == [99], fourth_proj["stuck"])
@@ -675,7 +677,7 @@ design_row = next(r for r in recent if r["lane"] == "riffmap-design")
 check("quota is worded as quota, never cost or a bare number",
       "equivalent" in design_row["quota"] and "not billed" in design_row["quota"], design_row["quota"])
 check("card link points at the project's own repo, not a generic one",
-      design_row["card"]["url"] == "https://github.com/roloc/riffmap/issues/620", design_row)
+      design_row["card"]["url"] == "https://github.com/lonestarprod/riffmap/issues/620", design_row)
 
 print("8. a board that cannot be reached degrades that project, not the whole page")
 
@@ -819,13 +821,13 @@ L, T = "1" * 40, "2" * 40
 def fake_git(live, target):
     return lambda d, *a: {("rev-parse", "HEAD"): live, ("rev-parse", "origin/main"): target}.get(tuple(a), "")
 def dstate():
-    return floor.deploy_status("/x", DS, "roloc/watcher", git=fake_git(L, T))
+    return floor.deploy_status("/x", DS, "lonestarprod/watcher", git=fake_git(L, T))
 def reset():
     for d_ in ("held", "evals"):
         for f_ in os.listdir(os.path.join(DS, d_)): os.remove(os.path.join(DS, d_, f_))
 reset()
 check("the box on main's newest commit is live",
-      floor.deploy_status("/x", DS, "roloc/watcher", git=fake_git(L, L))["state"] == "live")
+      floor.deploy_status("/x", DS, "lonestarprod/watcher", git=fake_git(L, L))["state"] == "live")
 check("behind with nothing recorded yet is checking", dstate()["state"] == "checking")
 open(os.path.join(DS, "evals", T), "w").write("fail 1")
 check("one suite failure is testing (the retry)", dstate()["state"] == "testing")
@@ -833,15 +835,15 @@ check("one suite failure is testing (the retry)", dstate()["state"] == "testing"
 # cloned, installed and the pointer flipped inside one run, never split across a pause.
 open(os.path.join(DS, "held", T), "w").write("58")
 check("a held commit that is now live is live, not held (review finding)",
-      floor.deploy_status("/x", DS, "roloc/watcher", git=fake_git(T, T))["state"] == "live")
+      floor.deploy_status("/x", DS, "lonestarprod/watcher", git=fake_git(T, T))["state"] == "live")
 h = dstate()
 check("a held commit is held, with its card", h["state"] == "held" and h["card"]["number"] == 58
-      and h["card"]["url"] == "https://github.com/roloc/watcher/issues/58", h)
+      and h["card"]["url"] == "https://github.com/lonestarprod/watcher/issues/58", h)
 def boom():
     raise subprocess.TimeoutExpired("git", 10)
 state17c = floor.build_state(PROJECTS, STATE, stub_board_fetcher, unit_active_fn=stub_unit_active,
                              ask_fn=stub_ask, now=NOW, box_name="test-box",
-                             deploy_fn=boom, deploy_repo="roloc/riffmap")
+                             deploy_fn=boom, deploy_repo="lonestarprod/riffmap")
 check("a deployer read that blows up leaves the page up, with no deploy block",
       all("deploy" not in p["ship"] for p in state17c["projects"]))
 check("a checkout that is not a repo shows no deployer", floor.deploy_status("/x", DS, "r/w", git=lambda d, *a: "") is None)
@@ -888,7 +890,7 @@ print("     lanes mid-tick holding a deploy, with no sign on the floor page of e
 reset()
 
 def deploy_now():
-    return floor.deploy_status("/x", DS, "roloc/watcher", git=fake_git(L, T), lanes=WAIT_LANES,
+    return floor.deploy_status("/x", DS, "lonestarprod/watcher", git=fake_git(L, T), lanes=WAIT_LANES,
                                 now=NOW, running_fn=lambda: RUNNING)
 
 RUNNING = False
@@ -951,8 +953,8 @@ def wait_lane(name, project_repo, tick_timeout, launched_minutes_ago, card):
 # well before the other, each with its own watchdog ceiling — the Ship desk's "lands by"
 # is the LATER of the two deadlines, plus one timer period, never the first one it finds.
 WAIT_LANES = [
-    wait_lane("watcher", "roloc/watcher", 150, 30, 42),    # deadline: NOW + 120m
-    wait_lane("riffmap", "roloc/riffmap", 60, 10, 777),    # deadline: NOW +  50m — not the latest
+    wait_lane("watcher", "lonestarprod/watcher", 150, 30, 42),    # deadline: NOW + 120m
+    wait_lane("riffmap", "lonestarprod/riffmap", 60, 10, 777),    # deadline: NOW +  50m — not the latest
 ]
 waiting = deploy_now()["waiting_for"]
 check("every busy, paused-for-deploy lane is listed, project and card included",
@@ -960,7 +962,7 @@ check("every busy, paused-for-deploy lane is listed, project and card included",
       == {("watcher", "watcher", 42), ("riffmap", "riffmap", 777)}, waiting)
 check("each one links straight to its own card",
       {w["card"]["url"] for w in waiting}
-      == {"https://github.com/roloc/watcher/issues/42", "https://github.com/roloc/riffmap/issues/777"})
+      == {"https://github.com/lonestarprod/watcher/issues/42", "https://github.com/lonestarprod/riffmap/issues/777"})
 w42 = next(w for w in waiting if w["card"]["number"] == 42)
 check("its own watchdog deadline: launched + that lane's own TICK_TIMEOUT, not a shared default",
       w42["deadline_at"] == (NOW + timedelta(minutes=120)).isoformat(), w42)
@@ -970,7 +972,7 @@ check("lands_by is the LATEST deadline, plus one timer period — never the firs
 
 # A lane with a PAUSE file Steve made by hand (never "deploy <sha>") is not this — only the
 # canary stage's own pause ever blames a deploy, card #106.
-WAIT_LANES = [wait_lane("hand-paused", "roloc/watcher", 150, 5, 99)]
+WAIT_LANES = [wait_lane("hand-paused", "lonestarprod/watcher", 150, 5, 99)]
 with open(os.path.join(WAITDIR, "hand-paused", "PAUSE"), "w") as f:
     f.write("")  # overwrite wait_lane's default: Steve's own empty, hand-made PAUSE
 check("a hand-made PAUSE is never read as the deployer waiting on it",
@@ -978,7 +980,7 @@ check("a hand-made PAUSE is never read as the deployer waiting on it",
 
 # Once the deploy is actually live, none of this applies — only the alive line does.
 check("live: no step, nobody waited on, no lands-by — only the alive line, so the desk never looks frozen",
-      floor.deploy_status("/x", DS, "roloc/watcher", git=fake_git(L, L), lanes=WAIT_LANES, now=NOW,
+      floor.deploy_status("/x", DS, "lonestarprod/watcher", git=fake_git(L, L), lanes=WAIT_LANES, now=NOW,
                           running_fn=lambda: False)
       == {"live": L[:7], "target": L[:7], "state": "live",
           "alive": {"running": False, "since_sec": 120, "next_in_sec": 180, "stale": False},
@@ -1022,7 +1024,7 @@ def bu_fixture(name, ages_min, held, deployed_age_min):
     for h in held: open(os.path.join(BUS, "held", h), "w").write("225")
     return live
 live_bu = bu_fixture("old", [26 * 60 - 10, 20 * 60, 3 * 60], ["a" * 40, "b" * 40], 26 * 60)
-bu = floor.deploy_status(os.path.join(BU, "repo"), BUS, "roloc/watcher", now=NOW)
+bu = floor.deploy_status(os.path.join(BU, "repo"), BUS, "lonestarprod/watcher", now=NOW)
 check("three commits ahead, deployed 26 hours ago, two held: backed up", bu["backed_up"] is True, bu)
 check("...with the pile counted: behind 3, held_count 2", bu["behind"] == 3 and bu["held_count"] == 2, bu)
 check("...and the oldest waiting commit's time and the pointer flip's time",
@@ -1030,17 +1032,17 @@ check("...and the oldest waiting commit's time and the pointer flip's time",
       and bu["live_since"] == (NOW - timedelta(minutes=26 * 60)).isoformat(), bu)
 open(os.path.join(BUS, "held", live_bu), "w").write("1")
 check("the live commit's own held file (a deploy-anyway) is not part of the pile",
-      floor.deploy_status(os.path.join(BU, "repo"), BUS, "roloc/watcher", now=NOW)["held_count"] == 2)
+      floor.deploy_status(os.path.join(BU, "repo"), BUS, "lonestarprod/watcher", now=NOW)["held_count"] == 2)
 bu_fixture("fresh", [20], [], 60)
-bf = floor.deploy_status(os.path.join(BU, "repo"), BUS, "roloc/watcher", now=NOW)
+bf = floor.deploy_status(os.path.join(BU, "repo"), BUS, "lonestarprod/watcher", now=NOW)
 check("one commit 20 minutes ahead, nothing held: not backed up, behind 1",
       bf["backed_up"] is False and bf["behind"] == 1 and bf["held_count"] == 0, bf)
 bu_fixture("held2", [10, 5], ["a" * 40, "b" * 40], 60)
 check("two held since the live release backs it up even when nothing is old",
-      floor.deploy_status(os.path.join(BU, "repo"), BUS, "roloc/watcher", now=NOW)["backed_up"] is True)
+      floor.deploy_status(os.path.join(BU, "repo"), BUS, "lonestarprod/watcher", now=NOW)["backed_up"] is True)
 bu_fixture("live", [], ["a" * 40], 26 * 60)
 check("on main's newest commit it is live, never backed up",
-      floor.deploy_status(os.path.join(BU, "repo"), BUS, "roloc/watcher", now=NOW)["backed_up"] is False)
+      floor.deploy_status(os.path.join(BU, "repo"), BUS, "lonestarprod/watcher", now=NOW)["backed_up"] is False)
 
 # Card #106: a lane's own $WATCHER_STATE/release (bin/spawn.sh writes it at process start)
 # is read for the Ship desk's per-lane view, box-wide — "riffmap" is on the live release,
@@ -1054,7 +1056,7 @@ open(os.path.join(STATE, "riffmap-design", "release"), "w").write(T[:12])
 state17 = floor.build_state(PROJECTS, STATE, stub_board_fetcher, unit_active_fn=stub_unit_active,
                             ask_fn=stub_ask, now=NOW, box_name="test-box",
                             ci_fetcher=lambda repo: {"sha": S, "runs": [("verify", "completed", "success")]},
-                            deploy_fn=dstate, deploy_repo="roloc/riffmap")
+                            deploy_fn=dstate, deploy_repo="lonestarprod/riffmap")
 rm17 = next(p for p in state17["projects"] if p["name"] == "riffmap")
 others = [p for p in state17["projects"] if p["name"] != "riffmap"]
 check("the deployer shows on the project whose repo it ships, only", "deploy" in rm17["ship"]
@@ -1622,8 +1624,8 @@ def stub_runs(repo):
         raise RuntimeError("gh: token ghp_notreal rejected")
     return green
 clock = [NOW24]
-look = floor.make_ship_lookup(lambda: {"watcher": "roloc/watcher", "riffmap": "roloc/riffmap", "down": "roloc/down"},
-                              stub_runs, deploy_repo="roloc/watcher",
+look = floor.make_ship_lookup(lambda: {"watcher": "lonestarprod/watcher", "riffmap": "lonestarprod/riffmap", "down": "roloc/down"},
+                              stub_runs, deploy_repo="lonestarprod/watcher",
                               deploy_fn=lambda: {"state": "live", "live": "f0651c6", "target": "f0651c6"},
                               history_fn=lambda: hist, now_fn=lambda: clock[0])
 check("a project that is not on the page is refused, and nothing is fetched for it",
@@ -1633,7 +1635,7 @@ check("the deploying project: CI and the deployer", w24["status"] == "ok" and "T
 check("any other project: CI only", "The box's deployer" not in look("riffmap")["lines"])
 look("watcher"); look("watcher")
 check("an open panel's polls share one fetch (GitHub is asked once per project)",
-      fetches == ["roloc/watcher", "roloc/riffmap"], fetches)
+      fetches == ["lonestarprod/watcher", "lonestarprod/riffmap"], fetches)
 dn = look("down")
 check("CI that cannot be reached still answers, and gh's own words never reach the page",
       dn["lines"] == ["CI could not be reached right now."] and "ghp_notreal" not in json.dumps(dn))
@@ -1653,12 +1655,12 @@ def fake_get(path):
          "conclusion": "success", "run_started_at": "2026-10-01T17:15:00Z", "updated_at": "x"},
         {"id": 10, "name": "CI", "head_sha": "b" * 40, "display_title": "Older", "status": "completed",
          "conclusion": "success", "run_started_at": "2026-10-01T15:00:00Z", "updated_at": "x"}]}
-fr = floor.fetch_ci_runs("roloc/watcher", get=fake_get)
+fr = floor.fetch_ci_runs("lonestarprod/watcher", get=fake_get)
 check("fetch_ci_runs asks for push runs on main, whether a PR has one running, and jobs "
       "for the newest commit only",
-      got == ["repos/roloc/watcher/actions/runs?branch=main&event=push&per_page=6",
-              "repos/roloc/watcher/actions/runs?event=pull_request&per_page=5",
-              "repos/roloc/watcher/actions/runs/11/jobs?per_page=50"], got)
+      got == ["repos/lonestarprod/watcher/actions/runs?branch=main&event=push&per_page=6",
+              "repos/lonestarprod/watcher/actions/runs?event=pull_request&per_page=5",
+              "repos/lonestarprod/watcher/actions/runs/11/jobs?per_page=50"], got)
 check("...and what it returns is what ship_lines reads",
       "    ✓ The spawner suite · 28s" in floor.ship_lines(fr, NOW24)["lines"] and "jobs" not in fr[1])
 
@@ -1677,7 +1679,7 @@ def pr_running_get(path):
     return {"workflow_runs": [
         {"id": 11, "name": "CI", "head_sha": "a" * 40, "display_title": "Last shipped", "status": "completed",
          "conclusion": "success", "run_started_at": "2026-10-01T17:15:00Z", "updated_at": "x"}]}
-prr = floor.fetch_ci_runs("roloc/watcher", get=pr_running_get)
+prr = floor.fetch_ci_runs("lonestarprod/watcher", get=pr_running_get)
 check("the live PR run leads the list, ahead of what already shipped",
       prr[0]["pr"] == 80 and prr[0]["branch"] == "card-77" and prr[1]["sha"] == "a" * 40, prr)
 check("its own jobs were fetched, not the shipped commit's",
@@ -1698,7 +1700,7 @@ def pr_query_fails(path):
                                "status": "completed", "conclusion": "success",
                                "run_started_at": "2026-10-01T17:15:00Z", "updated_at": "x"}]}
 check("a failed check for a live PR never costs the push history",
-      floor.fetch_ci_runs("roloc/watcher", get=pr_query_fails)[0]["sha"] == "a" * 40)
+      floor.fetch_ci_runs("lonestarprod/watcher", get=pr_query_fails)[0]["sha"] == "a" * 40)
 
 def pr_closed_get(path):
     # GitHub empties `pull_requests` once the PR it ran for is closed — observed on this
@@ -1715,7 +1717,7 @@ def pr_closed_get(path):
                                "status": "completed", "conclusion": "success",
                                "run_started_at": "2026-10-01T17:15:00Z", "updated_at": "x"}]}
 check("a running check with no PR to attribute it to is left out, not mislabeled as main",
-      floor.fetch_ci_runs("roloc/watcher", get=pr_closed_get)[0]["sha"] == "a" * 40)
+      floor.fetch_ci_runs("lonestarprod/watcher", get=pr_closed_get)[0]["sha"] == "a" * 40)
 
 srv4 = ThreadingHTTPServer(("127.0.0.1", 0), floor.make_handler(FixedCache(), None, look))
 t4 = threading.Thread(target=srv4.serve_forever, daemon=True); t4.start()
@@ -1833,7 +1835,7 @@ with open(old_log, "w") as f:
                "result": "- Card: #40 x\n- Outcome: merged\n- Ended in: Done\n"}, f)
 os.utime(old_log, (0, 946684800))  # written in 2000: outside every window
 boards26 = {("roloc", 2): [{"number": 41, "state": "CLOSED", "status": "Done", "title": "The thing shipped",
-                            "labels": [], "url": "https://github.com/roloc/watcher/issues/41"}]}
+                            "labels": [], "url": "https://github.com/lonestarprod/watcher/issues/41"}]}
 state26 = floor.build_state(PROJECTS, STATE, lambda o, n: boards26.get((o, n), []), box_name="test-box",
                             box_stats_fn=lambda: {"cpus": 2, "load1": 0.5, "mem_total": 10, "mem_used": 5,
                                                   "disk_total": 20, "disk_used": 10, "uptime": 3600},
@@ -1936,16 +1938,16 @@ class _R:  # a stand-in `gh api` result
 _orig_run = floor.subprocess.run
 floor.subprocess.run = lambda cmd, **kw: (_calls.append(cmd), _R())[1]
 try:
-    got = floor.fetch_repo_picture("https://github.com/roloc/NullTrader/blob/main/docs/a%20b/x.png", ["roloc/NullTrader"])
+    got = floor.fetch_repo_picture("https://github.com/lonestarprod/NullTrader/blob/main/docs/a%20b/x.png", ["lonestarprod/NullTrader"])
     check("a project repo's blob picture is read through gh and typed image/png",
-          got == (b"\x89PNGdata", "image/png") and _calls[0][-1] == "repos/roloc/NullTrader/contents/docs/a%20b/x.png?ref=main", _calls)
+          got == (b"\x89PNGdata", "image/png") and _calls[0][-1] == "repos/lonestarprod/NullTrader/contents/docs/a%20b/x.png?ref=main", _calls)
     check("a repo that is not one of the box's projects is never read",
-          floor.fetch_repo_picture("https://github.com/evil/repo/blob/main/x.png", ["roloc/NullTrader"]) is None and len(_calls) == 1)
+          floor.fetch_repo_picture("https://github.com/evil/repo/blob/main/x.png", ["lonestarprod/NullTrader"]) is None and len(_calls) == 1)
     check("a blob link to something that is not a picture is never read",
-          floor.fetch_repo_picture("https://github.com/roloc/NullTrader/blob/main/.env", ["roloc/NullTrader"]) is None and len(_calls) == 1)
+          floor.fetch_repo_picture("https://github.com/lonestarprod/NullTrader/blob/main/.env", ["lonestarprod/NullTrader"]) is None and len(_calls) == 1)
     for bad in ("blob/main/.env%3Fx=.png", "blob/main/.env%23.png", "blob/main/a/..%2F..%2Fx.png", "blob/main/a%00.png"):
         check(f"an encoded {bad.split('/')[-1]} cannot turn a picture link into any other file",
-              floor.fetch_repo_picture("https://github.com/roloc/NullTrader/" + bad, ["roloc/NullTrader"]) is None and len(_calls) == 1)
+              floor.fetch_repo_picture("https://github.com/lonestarprod/NullTrader/" + bad, ["lonestarprod/NullTrader"]) is None and len(_calls) == 1)
 finally:
     floor.subprocess.run = _orig_run
 

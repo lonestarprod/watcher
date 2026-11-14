@@ -1394,7 +1394,7 @@ def build_state(projects_dir, state_root, board_fetcher, unit_active_fn=None, as
         except Exception as e:
             items = []
             # The page says only "unreachable". The reason is gh's stderr, which the card
-            # keeps off the page (roloc/watcher#40, "never ... stderr"), so it goes to the
+            # keeps off the page (lonestarprod/watcher#40, "never ... stderr"), so it goes to the
             # service's journal instead.
             board_error = True
             print(f"floor: board {p['board_owner']}/{p['board_number']} unreachable: {e}",
@@ -3368,7 +3368,7 @@ function cookieTime() {
 window.__cookieTime = cookieTime;
 // Where everyone stands at cookie time: a huddle in front of the machine, at most four
 // across and as many rows as it takes, a seat's width apart (the same spacing as
-// everywhere, so nobody stands on anybody — review of roloc/watcher#119 caught a tighter
+// everywhere, so nobody stands on anybody — review of lonestarprod/watcher#119 caught a tighter
 // crowd with its plates stacked, and the usability pass caught a single row that looked
 // like nobody had moved). Each row is shifted into the room whole rather than clamped
 // spot by spot. Rows are counted so the room can grow to hold them for the party.

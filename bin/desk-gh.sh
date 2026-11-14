@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# The desk's one road to GitHub reads (card #205, review of roloc/watcher#218, round 4): a
+# The desk's one road to GitHub reads (card #205, review of lonestarprod/watcher#218, round 4): a
 # permission rule is a command prefix, and `gh issue view 1 -R <host>/<owner>/<repo>` sends
 # a request to any host with chosen text in it. This script fixes the repository to one
 # `owner/repo` on github.com, allows four read subcommands, and refuses every argument that

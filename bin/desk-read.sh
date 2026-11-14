@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # The desk's one road to the board and to a dry run of the spawner (card #205, review of
-# roloc/watcher#218): a Claude Code permission rule is a command PREFIX, so an allow list that
+# lonestarprod/watcher#218): a Claude Code permission rule is a command PREFIX, so an allow list that
 # named `board`, `python3 …/board.py`, `set -a` or `. /opt/watcher/projects/` could be bent
 # into a write or into sourcing an arbitrary file. This script takes a lane name and one of
 # five READ subcommands, sources that lane's own projects/<lane>.env itself (so BOARD_OWNER

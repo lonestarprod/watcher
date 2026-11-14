@@ -50,7 +50,7 @@ echo "gh $*" >> "$CALLS"
 echo "gh-env WATCHER_APP_PROJECT=${WATCHER_APP_PROJECT:-} shim_first=${PATH%%:*}" >> "$TMP/gh-env"
 case "$1 $2" in
   "api repos/"*) cat "$TMP/ci" 2>/dev/null ;;
-  "issue create") echo "https://github.com/roloc/watcher/issues/$(cat "$TMP/next-issue" 2>/dev/null || echo 77)" ;;
+  "issue create") echo "https://github.com/lonestarprod/watcher/issues/$(cat "$TMP/next-issue" 2>/dev/null || echo 77)" ;;
   "issue view") cat "$TMP/labels" 2>/dev/null ;;
 esac
 EOF
@@ -72,9 +72,9 @@ if [ "$1" = file ]; then
       echo $(( $(cat "$TMP/board-fails") - 1 )) > "$TMP/board-fails"
       continue
     fi
-    echo "https://github.com/roloc/watcher/issues/$n"; exit 0
+    echo "https://github.com/lonestarprod/watcher/issues/$n"; exit 0
   done
-  echo "https://github.com/roloc/watcher/issues/$n"; exit 3
+  echo "https://github.com/lonestarprod/watcher/issues/$n"; exit 3
 fi
 EOF
 printf '#!/usr/bin/env bash\nexit 0\n' > "$BIN/flock"
@@ -91,7 +91,7 @@ git -C "$SEED" config user.email t@t; git -C "$SEED" config user.name t
 mkdir -p "$SEED"/{projects,deploy,bin,commands}
 cat > "$SEED/projects/watcher.env" <<'EOF'
 PROJECT_NAME=watcher
-PROJECT_REPO=roloc/watcher
+PROJECT_REPO=lonestarprod/watcher
 BOARD_OWNER=roloc
 BOARD_NUMBER=2
 EOF
@@ -258,7 +258,7 @@ check "first fail: the step file says step 3 (the replay suite)" [ "$(sed -n 1p 
 run
 check "second fail: one card filed"                    [ "$(count 'board file')" = 1 ]
 check "…in the talking-to-the-owner shape (the ask first)" called "Deploy held: ${T:0:7} is not live"
-check "…put on the watcher board"                      called "board file -R roloc/watcher .*owner=roloc number=2"
+check "…put on the watcher board"                      called "board file -R lonestarprod/watcher .*owner=roloc number=2"
 check "…and moved to Stuck"                            called "board move 77 Stuck - Needs help owner=roloc number=2"
 check "…and the box did not move"                      [ "$(head_)" != "$T" ]
 check "held: the step file is cleared, not left on the failed step" [ ! -e "$TMP/dstate/step" ]
@@ -396,7 +396,7 @@ echo "takes a commit first, on a second checkout, before it reaches every other 
 # the canary stage still pauses and restarts only its own lane(s), directly.
 cat > "$SEED/projects/watcher.env" <<'EOF'
 PROJECT_NAME=watcher
-PROJECT_REPO=roloc/watcher
+PROJECT_REPO=lonestarprod/watcher
 BOARD_OWNER=roloc
 BOARD_NUMBER=2
 LANE_CHANNEL=canary
@@ -657,7 +657,7 @@ INSTALL="$HERE/../deploy/install.sh"
 IWATCHER="$TMP/install-watcher"; ICANARY="$TMP/install-watcher-canary"
 rm -rf "$IWATCHER" "$ICANARY"
 git clone -q "$ORIGIN" "$IWATCHER"
-git -C "$IWATCHER" remote set-url origin "https://github.com/roloc/watcher.git"
+git -C "$IWATCHER" remote set-url origin "https://github.com/lonestarprod/watcher.git"
 
 # A `git clone` of anything that looks like a network URL fails exactly the way root hitting
 # a private repo with no login does (the card's own evidence: "fatal: could not read
@@ -675,12 +675,12 @@ exec "$REAL_GIT" "\$@"
 EOF
 chmod +x "$IBIN/git"
 
-WATCHER_DIR="$IWATCHER" WATCHER_CANARY_DIR="$ICANARY" WATCHER_REPO="https://github.com/roloc/watcher.git" \
+WATCHER_DIR="$IWATCHER" WATCHER_CANARY_DIR="$ICANARY" WATCHER_REPO="https://github.com/lonestarprod/watcher.git" \
   INSTALL_LIB_ONLY=1 PATH="$IBIN:$PATH" bash -c "source '$INSTALL'; canary_clone" > "$TMP/install-out" 2>&1
 
 check "install canary: the checkout exists after the clone" [ -d "$ICANARY/.git" ]
 check "install canary: its origin is the TRUE upstream, not the local source path" \
-      [ "$(git -C "$ICANARY" remote get-url origin 2>/dev/null)" = "https://github.com/roloc/watcher.git" ]
+      [ "$(git -C "$ICANARY" remote get-url origin 2>/dev/null)" = "https://github.com/lonestarprod/watcher.git" ]
 not_grep() { ! grep -q -- "$1" "$2"; }
 check "install canary: never attempted an HTTPS clone (the stub would have failed it)" \
       not_grep "could not read Username" "$TMP/install-out"
@@ -717,7 +717,7 @@ check "existing watcher user: checks for the account first" called "id watcher"
 check "existing watcher user: reads the origin as watcher, not as root" \
       called "su - watcher -c"
 check "existing watcher user: REPO_URL comes out right" \
-      grep -q "REPO_URL=https://github.com/roloc/watcher.git" "$TMP/repo-url-out"
+      grep -q "REPO_URL=https://github.com/lonestarprod/watcher.git" "$TMP/repo-url-out"
 
 # Before the watcher account exists (the very first run — README's clone, then this
 # script, both as root, before `useradd` below ever fires), nothing has chowned anything
@@ -736,7 +736,7 @@ WATCHER_DIR="$IWATCHER" INSTALL_LIB_ONLY=1 PATH="$IBIN:$PATH" bash -c \
   "source '$INSTALL'; echo \"REPO_URL=\$REPO_URL\"" > "$TMP/repo-url-out2" 2>&1
 check "no watcher user yet: never calls su at all" not_called "su"
 check "no watcher user yet: REPO_URL still comes out right" \
-      grep -q "REPO_URL=https://github.com/roloc/watcher.git" "$TMP/repo-url-out2"
+      grep -q "REPO_URL=https://github.com/lonestarprod/watcher.git" "$TMP/repo-url-out2"
 
 # The history file: what the deployer said, where the floor page can read it (the page's
 # user cannot read the journal).

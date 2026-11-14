@@ -9,7 +9,7 @@ guess about what git would do). No network, ever: everything here is a local fil
 local repo, and any `gh`/`board` shape neither stub script nor this file recognizes is a
 loud failure, never a silent success and never a fall-through to the real `gh` (see the
 stub scripts) — a tick under test runs with real GitHub credentials sitting right there on
-the box, and this is the only thing standing between it and the real roloc/watcher repo.
+the box, and this is the only thing standing between it and the real lonestarprod/watcher repo.
 
     python3 fakehub.py gh <argv...>       # a `gh` subcommand, argv exactly as typed
     python3 fakehub.py board <argv...>    # a `board` subcommand, same

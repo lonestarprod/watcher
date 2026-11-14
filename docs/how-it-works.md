@@ -83,7 +83,7 @@ Labels and fields the bots read:
   done or asks for work. From then on it is ordinary work for the labeled lane: the tick
   removes the label and says so in one FYI line (`commands/watch.md` §4). Their newest
   comment is the ask, whatever the body's Verification or Owner sections still say
-  (riffmap [#778](https://github.com/roloc/riffmap/issues/778), October 17, 2026).
+  (riffmap [#778](https://github.com/lonestarprod/riffmap/issues/778), October 17, 2026).
 - **`blocked`** — straight to Stuck.
 - **`awaiting-rebuild`** (card #85) — the tick merged this card's fix and found the artifact
   gated on a known downstream rebuild (`commands/watch.md` §3): it left this label on and
@@ -125,7 +125,7 @@ poll, the floor page) can re-warm the cache with the stale, pre-mutation snapsho
 serves for the rest of the TTL with nothing left to invalidate it again.
 
 **October 9, 2026 (card #114):** every board on the floor page read unreachable and every
-lane slept five minutes — the second time in two days ([#98](https://github.com/roloc/watcher/issues/98)
+lane slept five minutes — the second time in two days ([#98](https://github.com/lonestarprod/watcher/issues/98)
 was the first). The account had burned its full 5,000-point hour in nineteen minutes, about
 125 points a minute, and nothing on the box could say where they went: the cache from #98
 was live and deployed the whole time, and it still was not enough. Measured afterward, idle
@@ -246,9 +246,9 @@ Stage-grouped view the owner works from. `handle_exit` empties the Stage of the 
 tick was holding when it closed (step 6 above), which covers a tick that merges its own
 PR. It does not cover **a card that closes with no tick on it**: the owner merging the PR of a
 card parked in Stuck, or closing a card by hand. Five cards on the watcher's own board
-sat in Done reading "Parked" that way (watcher [#35](https://github.com/roloc/watcher/issues/35),
-[#36](https://github.com/roloc/watcher/issues/36), [#40](https://github.com/roloc/watcher/issues/40),
-[#43](https://github.com/roloc/watcher/issues/43), [#44](https://github.com/roloc/watcher/issues/44),
+sat in Done reading "Parked" that way (watcher [#35](https://github.com/lonestarprod/watcher/issues/35),
+[#36](https://github.com/lonestarprod/watcher/issues/36), [#40](https://github.com/lonestarprod/watcher/issues/40),
+[#43](https://github.com/lonestarprod/watcher/issues/43), [#44](https://github.com/lonestarprod/watcher/issues/44),
 September 28, 2026).
 
 So every five minutes (`STAGE_SWEEP_SEC`, an env knob like the In review limits, exported by
@@ -276,12 +276,12 @@ reason: the project's own `CLAUDE.md` names a downstream rebuild that has to fin
 off this box, in its own time. `commands/watch.md` §3 gives that one case its own exit
 instead of Stuck or a wasted re-poll inside the tick's own window: label the card
 `awaiting-rebuild`, remove `in-flight`, leave it In progress, stop (riffmap
-[#602](https://github.com/roloc/riffmap/issues/602), October 8, 2026, is why — a tick that
+[#602](https://github.com/lonestarprod/riffmap/issues/602), October 8, 2026, is why — a tick that
 re-checked a 32-meeting rebuild a few times inside one run, then parked asking the owner
 "should I keep checking back?", for a wait that needed nobody). `pick_card` skips a card
 carrying that label (one FYI comment the first poll it sees it, no attempt counted), until
 a project's own workflow removes it when the rebuild ends (riffmap
-[#637](https://github.com/roloc/riffmap/issues/637)) — then the next poll hands it to a
+[#637](https://github.com/lonestarprod/riffmap/issues/637)) — then the next poll hands it to a
 tick to re-check the artifact and close or park on what it now shows.
 
 That workflow runs off this box, so the wait cannot be open-ended: every poll, `spawn.sh`'s
@@ -476,7 +476,7 @@ deployer's own: while it waits for a busy canary lane to go idle before moving t
 checkout, it writes `deploy <sha>` to that lane's `PAUSE` (a hand-made `PAUSE` is left
 alone). That file is lifted the moment the deployer stops caring about the commit it was
 written for — when the canary moves (the lane restarts on it) and, since card
-[#150](https://github.com/roloc/watcher/issues/150) (October 14, 2026), on **every hold**,
+[#150](https://github.com/lonestarprod/watcher/issues/150) (October 14, 2026), on **every hold**,
 including a hold of a newer commit that superseded the one the pause was written for.
 Before that, a hold left the pause behind: the watcher's own lane sat paused with no
 held card it was allowed to work, so the card's "let the watcher fix it" option could
@@ -553,7 +553,7 @@ rather than launching it. The **one** exception is a reference to an issue that 
 exist: a typo can block nothing, and a permanent 404 treated like a transient outage would
 skip the card silently for ever, so it is dropped with a line in the journal naming it.
 
-(riffmap [#447](https://github.com/roloc/riffmap/issues/447), September 20, 2026, is why
+(riffmap [#447](https://github.com/lonestarprod/riffmap/issues/447), September 20, 2026, is why
 this exists: three cards filed together at 02:50, each naming the one before it in its
 body, none recorded. The third was picked thirteen hours later and spent its whole tick
 rediscovering by hand what its own first line said.)
@@ -686,7 +686,7 @@ single card behind it (below).
 
 That is the whole list, plus the one exception `bin/metrics.py`'s own header always named
 as a possibility ("a weekly Discord digest is a separate decision") — card
-[#139](https://github.com/roloc/watcher/issues/139) is that decision, made once and run on
+[#139](https://github.com/lonestarprod/watcher/issues/139) is that decision, made once and run on
 a fixed schedule rather than per event, the way `stuck`/`released`/`breach` each are. A
 card changing column, crossing into a new stage, shipping, or being closed by hand posts
 nothing, and neither does a run that ended with its PR open (the next poll merges it): the
@@ -709,7 +709,7 @@ lanes are under `WATCHER_STATE_ROOT`.
 
 The spawner's sweeps keep the *loop* healthy. Nothing above watches the product itself — a
 regression that ships to a project's own staging box waited for the owner to notice it,
-until card [#36](https://github.com/roloc/watcher/issues/36). `bin/detect.sh` closes that gap the
+until card [#36](https://github.com/lonestarprod/watcher/issues/36). `bin/detect.sh` closes that gap the
 same way the deployer closes its own: a small script on a timer, no model, deterministic.
 
 - **Generic in the watcher, specific in the project.** `bin/detect.sh <project>` does

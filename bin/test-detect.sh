@@ -246,7 +246,7 @@ echo
 echo "riffmap-health-probe.sh"
 
 # riffmap's own metric script (projects/riffmap.detect.env's DETECT_METRIC_CMD): stub
-# `curl` to hand back one status code and check the probe's verdict on it (roloc/watcher#36,
+# `curl` to hand back one status code and check the probe's verdict on it (lonestarprod/watcher#36,
 # Steve, September 28, 2026 — a probe of the bare IP was answered by a different app on the
 # same box, so the fix probes RiffMap by name and treats its own 401-to-anonymous as up).
 PROBE="$HERE/../projects/riffmap-health-probe.sh"

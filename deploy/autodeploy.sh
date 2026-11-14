@@ -28,7 +28,7 @@
 #      anything goes live — the suite copies the prompts from the checkout it runs in, so
 #      this tests the new prompts, not the ones lanes are already using. Skipped when the
 #      commits touch nothing a model reads. A fail is retried once (a live suite has flakes,
-#      roloc/watcher#44); a second fail holds the commit.
+#      lonestarprod/watcher#44); a second fail holds the commit.
 #   3b. THE CANARY STAGE (card #46), only when the commit touches what a model reads and at
 #      least one active lane's project file sets LANE_CHANNEL=canary: move the canary
 #      checkout (/opt/watcher-canary — a second, independent clone; see bin/spawn.sh's own

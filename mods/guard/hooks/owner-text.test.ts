@@ -12,7 +12,7 @@ const TEMPLATE = `🤖 **Needs @alex: pick where speaker names live in the meeti
 
 **Look:** (only when there is something to open)
 - The mockup: https://example.com/mockups/a.html?v=2
-- The PR: https://github.com/roloc/watcher/pull/1
+- The PR: https://github.com/lonestarprod/watcher/pull/1
 
 **Question: where should speaker names live?**
 - **A. Inside the summary format** (recommended) — one source of truth; changes a shared format.
@@ -78,7 +78,7 @@ test('each numbered rule names itself and quotes the line', () => {
 test('commentBody finds the literal body or the file, and ignores what it cannot see', () => {
   const body = (c: string) => commentBody(segments(c)[0])
   expect(body('gh issue comment 5 --body "hello there"')).toEqual({ inline: 'hello there' })
-  expect(body('gh pr comment 5 -R roloc/watcher --body-file "$scratch/stuck.md"')).toEqual({ file: '$scratch/stuck.md' })
+  expect(body('gh pr comment 5 -R lonestarprod/watcher --body-file "$scratch/stuck.md"')).toEqual({ file: '$scratch/stuck.md' })
   expect(body('gh issue comment 5 -F out.md')).toEqual({ file: 'out.md' })
   expect(body('gh issue comment 5 --body-file -')).toBeUndefined()
   expect(body('gh issue comment 5 --body "$(cat x.md)"')).toBeUndefined()

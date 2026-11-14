@@ -62,7 +62,7 @@ at something outside the repo — a URL, a host or IP, a probe, an endpoint, a w
 path on a box — make the call (a read-only one: GET or HEAD; never post to a webhook
 or change anything to test it) and confirm the answer comes from the thing the PR says it
 does, not merely that something answered. A 200 from the wrong app is the failure this
-catches: [roloc/watcher#48](https://github.com/roloc/watcher/pull/48) (September 28, 2026) aimed a RiffMap health probe at
+catches: [lonestarprod/watcher#48](https://github.com/lonestarprod/watcher/pull/48) (September 28, 2026) aimed a RiffMap health probe at
 lonestar-web's bare IP, which serves Azeroth Rewind, and passed CI and two review rounds
 because nobody looked at what answered. A check pointed at the wrong target is
 **blocking** (wrong runtime behavior). If you cannot reach it from where you run, say so
@@ -83,7 +83,7 @@ that cannot start where you are — no browser on this machine — is not the pa
 say so, and report the finding as plausible. Plain text and documents are not screens in
 this sense; nothing here applies to them. "Works in practice" about a click, a layout or a
 script you only read is a guess — say plausible, never confirmed.
-([roloc/watcher#70](https://github.com/roloc/watcher/pull/70), October 1, 2026: a page
+([lonestarprod/watcher#70](https://github.com/lonestarprod/watcher/pull/70), October 1, 2026: a page
 whose `<script>` block did not parse passed this review with three nits fixed, and shipped
 drawing nothing.)
 

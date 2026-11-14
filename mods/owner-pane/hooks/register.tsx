@@ -56,7 +56,7 @@ async function refresh($: Dollar, floor: string): Promise<Snapshot> {
 export const register: Register = (on, options) => {
   const o = options as Options
   const floor = (o.floorUrl ?? 'http://agents:8787').replace(/\/+$/, '')
-  const defaultRepo = o.repo ?? 'roloc/watcher'
+  const defaultRepo = o.repo ?? 'lonestarprod/watcher'
 
   on('session.start', async ($, e, next) => {
     await $.command.register({ name: 'stuck', description: 'The open questions waiting on you; /stuck <n> <reply> answers one' })
