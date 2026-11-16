@@ -47,6 +47,7 @@ build_case() {
   ORIGIN="$TMP/origin.git"; WORKTREE="$TMP/worktree"
   FAKEHUB_STATE="$TMP/state.json"; EVAL_LOG="$TMP/log.txt"
   ISSUE=100; CASE_COMMAND=""; CASE_MAX_TURNS=""; CASE_MAX_BUDGET_USD=""; CASE_TIMEOUT_SEC=""
+  CASE_LANE=""; CASE_LANE_AGENTS=""
   export FAKEHUB_STATE FAKEHUB_ORIGIN="$ORIGIN" FAKEHUB_LOG="$EVAL_LOG"
   : > "$EVAL_LOG"
   echo '{"next_issue":200,"next_pr":1,"issues":{},"prs":{}}' > "$FAKEHUB_STATE"
@@ -85,7 +86,8 @@ merged_fix() { push_to_main "$1" "fix for #100"; }
 # $TMP/out for the expectations below to read.
 run_check() {
   RESULT_RC=0
-  RESULT_JSON='{"subtype":"success","num_turns":12,"total_cost_usd":0.3}'
+  RESULT_JSON="${RESULT_OVERRIDE:-}"
+  [ -n "$RESULT_JSON" ] || RESULT_JSON='{"subtype":"success","num_turns":12,"total_cost_usd":0.3}'
   ( case_check ) > "$TMP/out" 2>&1
 }
 
@@ -456,6 +458,39 @@ run_check
 expect_fail "owner-comment/wrong lane" "no agent: builder label" "agent: architect"
 expect_fail "owner-comment/wrong lane" "no FYI naming builder" "architect lane"
 expect_ok   "owner-comment/wrong lane" "no new Needs comment posted"
+done_with_case
+
+# =========================================================================================
+# routed-card-is-this-lanes (card #302): the design lane's tick is handed the card the build
+# lane routed to it. The right tick claims it and says something on the card; the NullTrader
+# #131 shape does nothing at all and reports the card as some other lane's.
+echo "== routed-card-is-this-lanes =="
+
+build_case routed-card-is-this-lanes
+check "routed-card: the case names its lane" [ "$CASE_LANE" = fixture-design ]
+check "routed-card: ...and the labels the lane takes" [ "$CASE_LANE_AGENTS" = designer ]
+printf 'gh issue comment 100 --body 🤖 Watcher picked this up at 2026-11-16T17:05:27Z.\ngh issue edit 100 --add-label in-flight\n' >> "$EVAL_LOG"
+card_edit "it['comments'].append('🤖 FYI: plan for this card — a short brief for the empty state.'); it['labels'].append('in-flight')"
+run_check
+expect_clean "routed-card/claimed and working"
+done_with_case
+
+build_case routed-card-is-this-lanes
+RESULT_OVERRIDE='{"subtype":"success","num_turns":2,"result":"Card #100 is not mine to work. Its label is `agent: designer`, so the design lane owns it. I changed nothing and did not claim it."}'
+run_check
+expect_fail "routed-card/the #131 shape" "the tick never claimed the card"
+expect_fail "routed-card/the #131 shape" "the tick said nothing on the card" "2 comment(s), 2 seeded"
+expect_fail "routed-card/the #131 shape" "the tick disowned the card" "not mine to work"
+expect_ok   "routed-card/the #131 shape" "still labeled agent: designer"
+unset RESULT_OVERRIDE
+done_with_case
+
+# Claimed, then handed back: the label moved to another lane's.
+build_case routed-card-is-this-lanes
+printf 'gh issue edit 100 --add-label in-flight\ngh issue edit 100 --remove-label agent: designer --add-label agent: builder\n' >> "$EVAL_LOG"
+card_edit "it['comments'].append('🤖 FYI: routed back to the builder.'); it['labels']=['agent: builder']"
+run_check
+expect_fail "routed-card/routed back" "the card was relabeled away from the design lane" "agent: builder"
 done_with_case
 
 echo "$n check(s), $([ "$fail" = 0 ] && echo "all passed" || echo "SOME FAILED")"

@@ -64,6 +64,9 @@
 #                    (EVAL_MAX_TURNS / EVAL_MAX_BUDGET_USD / EVAL_CASE_TIMEOUT_SEC) — tighter
 #                    for a case that must run into one, looser for a case whose honest
 #                    path is longer than the rest of the suite's (see usability-blocks-sliver).
+#                    May set CASE_LANE / CASE_LANE_AGENTS: the lane bin/spawn.sh would have
+#                    launched the tick from (WATCHER_LANE, WATCHER_LANE_AGENTS — card #302).
+#                    Unset, the tick is told no lane, as on a project with one.
 #   case_check()   - after the tick runs, call pass/flunk against $FAKEHUB_STATE (read it
 #                    with evals/state.py), $EVAL_LOG (the stub gh/board call log, one line
 #                    per call — grep it), $ORIGIN (real git: `git -C "$ORIGIN" log/show`),
@@ -273,6 +276,8 @@ run_case() {
   CASE_MAX_TURNS=""
   CASE_MAX_BUDGET_USD=""
   CASE_TIMEOUT_SEC=""
+  CASE_LANE=""
+  CASE_LANE_AGENTS=""
   export FAKEHUB_STATE FAKEHUB_ORIGIN="$ORIGIN" FAKEHUB_LOG="$EVAL_LOG"
 
   # A case may export BROWSE_BROWSER (to hand the tick a browser that logs its own starts).
@@ -334,6 +339,7 @@ run_case() {
     WATCHER_HOME="$REPO" \
     GH_REPO="$EVAL_GH_REPO" \
     OWNER_LOGIN="$EVAL_OWNER_LOGIN" \
+    WATCHER_LANE="$CASE_LANE" WATCHER_LANE_AGENTS="$CASE_LANE_AGENTS" \
     timeout "$secs" "$CLAUDE_BIN" -p "/watcher:${CASE_COMMAND#/}" \
       --dangerously-skip-permissions ${PLUGIN_ARGV[@]+"${PLUGIN_ARGV[@]}"} \
       --max-turns "$turns" --max-budget-usd "$budget" \

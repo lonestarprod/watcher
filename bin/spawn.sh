@@ -781,6 +781,39 @@ bump_attempts() {
   echo "$attempts"
 }
 
+# exit_reason <json> <subtype> <turns> — why a run that left its card In progress stopped, in
+# words the owner can choose A, B or C from (card #302). The spawner used to say only "The
+# run ended with the card still In progress": NullTrader #131 (November 16, 2026) was parked
+# on that line while the log it named held the tick's own answer — "Card #131 is not mine to
+# work" — which is a watcher bug, not a card to fix or drop. So: how it stopped, from the
+# result's subtype, and for a run that ended on its own, its last words — the first line of
+# the result, whitespace collapsed, capped at 300 characters, every `@` broken so a quoted
+# sentence pings nobody. A result with no text says so rather than quoting nothing.
+exit_reason() {
+  local json="$1" subtype="$2" turns="$3" how words
+  case "$subtype" in
+    success)              how="The run ended on its own without finishing the card or moving it" ;;
+    error_max_turns)      how="The run used all ${turns:-its} turns without finishing" ;;
+    error_max_budget_usd) how="The run reached its quota limit without finishing" ;;
+    unknown)              how="The run stopped without leaving a result (it was ended from outside, or it crashed)" ;;
+    *)                    how="The run stopped early ($subtype)" ;;
+  esac
+  words="$(python3 -c '
+import json, sys
+try:
+    r = json.load(open(sys.argv[1])).get("result") or ""
+except Exception:
+    r = ""
+line = next((" ".join(l.split()) for l in str(r).splitlines() if l.strip()), "")
+line = line.replace("@", "@\u200b")
+print(line[:300] + ("…" if len(line) > 300 else ""))' "$json" 2>/dev/null || true)"
+  if [ -n "$words" ]; then
+    printf '%s. Its last words: "%s"' "$how" "$words"
+  else
+    printf '%s. It left no last words.' "$how"
+  fi
+}
+
 # park_stuck <n> <detail> — the two-attempt Stuck move + comment, shared by handle_exit,
 # prepare_worktree, reconcile_stale_current, and pick_card's own safety-net branch.
 #
@@ -853,6 +886,12 @@ park_stuck() {
   # one) are the engineer's crumbs, kept short.
   local transcript_line=""
   [ -n "$transcript" ] && transcript_line=$'\n- Transcript kept: '"$(basename "$transcript")"
+  # Card #302: which runs these were. A pickup from In progress posts no comment and a tick
+  # that never claims leaves no "run ended" note, so the card itself can show no attempt at
+  # all (NullTrader #131: "2 attempts" on a card whose history showed none that day).
+  local runs_line="" runs
+  runs="$(ls "$WATCHER_LOGS"/card-"$n"-*.json 2>/dev/null | tail -n 2 | while read -r f; do basename "$f"; done | paste -sd, - | sed 's/,/, /g')"
+  [ -n "$runs" ] && runs_line=$'\n- Last runs on file: '"$runs"
   local body
   body="🤖 **Needs ${NEEDS_WHO}: this card failed 2 attempts, so I parked it.**
 
@@ -869,7 +908,7 @@ Reply A, B or C on this card, or say which way you lean, then move it.
 <details><summary>Details</summary>
 
 - Logs: $WATCHER_LOGS
-- Attempts on file: 2${transcript_line}
+- Attempts on file: 2${runs_line}${transcript_line}
 
 </details>"
   $WATCHER_BOARD stage "$n" Parked >/dev/null 2>&1 || true
@@ -900,11 +939,18 @@ Reply A, B or C on this card, or say which way you lean, then move it.
 # the result block, which is not enough for a post-mortem — riffmap #359 (September 16,
 # 2026) shipped a wrong fix and nobody could tell afterwards whether the tick had opened the
 # card's screenshot. Disk is cheap; `claude`'s own cleanup (cleanupPeriodDays) ages them out.
+#
+# WATCHER_LANE and WATCHER_LANE_AGENTS (card #302): which lane launched this tick. The launch
+# line is otherwise the same for every lane, so a design lane's tick that read the build
+# lane's "I routed this card to the designer" comment took itself for the build lane and left
+# the card for a lane that was itself (NullTrader #131, November 16, 2026: two five-second
+# ticks, then a park). mods/card-context puts both in the tick's system prompt.
 print_claude_cmd() {
   local n="$1" dir="$2" ts="$3"
   cat <<EOF
 (cd "$dir" && PATH="$WATCHER_SHIM_DIR:\$PATH" WATCHER_REAL_CLAUDE="$WATCHER_REAL_CLAUDE" \\
   WATCHER_LEDGER_CALLER="tick:$PROJECT_NAME:$n" WATCHER_CARD="$n" \\
+  WATCHER_LANE="$PROJECT_NAME" WATCHER_LANE_AGENTS="$LANE_AGENTS" \\
   "$WATCHER_REAL_CLAUDE" -p "$LAUNCH_COMMAND $n" \\
   --dangerously-skip-permissions${PLUGIN_ARGS:+ $PLUGIN_ARGS} \\
   --max-turns $TICK_MAX_TURNS --max-budget-usd $TICK_MAX_BUDGET_USD \\
@@ -1076,6 +1122,7 @@ launch_tick() {
   local launch_pwd="$PWD"
   cd "$dir"
   PATH="$WATCHER_SHIM_DIR:$(path_without_shims)" WATCHER_REAL_CLAUDE="$WATCHER_REAL_CLAUDE" WATCHER_CARD="$n" \
+  WATCHER_LANE="$PROJECT_NAME" WATCHER_LANE_AGENTS="$LANE_AGENTS" \
   "$WATCHER_REAL_CLAUDE" -p "$LAUNCH_COMMAND $n" \
       --dangerously-skip-permissions ${PLUGIN_ARGV[@]+"${PLUGIN_ARGV[@]}"} \
       --max-turns $TICK_MAX_TURNS --max-budget-usd $TICK_MAX_BUDGET_USD \
@@ -1387,7 +1434,7 @@ $transcript_note
   else
     attempts="$(bump_attempts "$n")"
     if [ "$attempts" -ge 2 ] && [ "$is_in_progress" = yes ]; then
-      park_stuck "$n" "The run ended with the card still In progress (log: $(basename "$json"))." "$transcript"
+      park_stuck "$n" "$(exit_reason "$json" "$subtype" "$num_turns")" "$transcript"
     fi
   fi
 

@@ -20,8 +20,20 @@ board list "In progress"
 
 Columns: `issue  priority  agent  flags  stage  title`. Rows are already sorted P0 → P2.
 
-- Take the **first row whose flags do not include `in-flight`** — unless the owner named
-  one here: $ARGUMENTS
+- Take the **first row whose flags do not include `in-flight`** — unless a card number
+  follows here: $ARGUMENTS
+- **A number there is the spawner handing you that card, and it is yours.** The spawner
+  launches a tick only for a card its own lane takes, so you are the lane the card's
+  `agent:` label belongs to: the label names the role you play this tick (§2), never some
+  other lane you should leave the card for. An earlier comment that says the card was
+  "routed to the designer" and "the design lane picks it up on its next poll" is describing
+  *you*, now. The card-context section at the end of your prompt names your lane when the
+  spawner passed it (`$WATCHER_LANE`, and the labels it takes in `$WATCHER_LANE_AGENTS`).
+  **Never end a tick on "not mine" or "the other lane will take it" for the card you were
+  launched for**: nobody else is coming, and two such exits park the card in Stuck with the
+  owner asked what went wrong (NullTrader #131, November 16, 2026: the design lane's tick
+  read the build lane's routing comment, took itself for the build lane, and exited in five
+  seconds, twice).
 - **`in-flight` means another tick already owns it.** Skip it. Never work two cards at once.
 - **Nothing to take?** Say so in one line and stop. That is a successful, quiet tick — do
   not go looking for other work, do not pull from Ready, do not tidy the board.
