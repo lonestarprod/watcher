@@ -788,7 +788,8 @@ bump_attempts() {
 # work" — which is a watcher bug, not a card to fix or drop. So: how it stopped, from the
 # result's subtype, and for a run that ended on its own, its last words — the first line of
 # the result, whitespace collapsed, capped at 300 characters, every `@` broken so a quoted
-# sentence pings nobody. A result with no text says so rather than quoting nothing.
+# sentence pings nobody and every `<` escaped so a quoted tag cannot fold the question away.
+# A result with no text says so rather than quoting nothing.
 exit_reason() {
   local json="$1" subtype="$2" turns="$3" how words
   case "$subtype" in
@@ -805,7 +806,7 @@ try:
 except Exception:
     r = ""
 line = next((" ".join(l.split()) for l in str(r).splitlines() if l.strip()), "")
-line = line.replace("@", "@\u200b")
+line = line.replace("@", "@\u200b").replace("<", "&lt;")
 print(line[:300] + ("…" if len(line) > 300 else ""))' "$json" 2>/dev/null || true)"
   if [ -n "$words" ]; then
     printf '%s. Its last words: "%s"' "$how" "$words"
@@ -890,7 +891,7 @@ park_stuck() {
   # that never claims leaves no "run ended" note, so the card itself can show no attempt at
   # all (NullTrader #131: "2 attempts" on a card whose history showed none that day).
   local runs_line="" runs
-  runs="$(ls "$WATCHER_LOGS"/card-"$n"-*.json 2>/dev/null | tail -n 2 | while read -r f; do basename "$f"; done | paste -sd, - | sed 's/,/, /g')"
+  runs="$(ls "$WATCHER_LOGS"/card-"$n"-*.json 2>/dev/null | tail -n 2 | while read -r f; do basename "$f"; done | paste -sd, - | sed 's/,/, /g' || true)"
   [ -n "$runs" ] && runs_line=$'\n- Last runs on file: '"$runs"
   local body
   body="🤖 **Needs ${NEEDS_WHO}: this card failed 2 attempts, so I parked it.**

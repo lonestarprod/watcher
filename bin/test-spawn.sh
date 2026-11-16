@@ -823,7 +823,7 @@ fresh_state
 board_list $'43\tP1\tdesigner\t-\tCard forty-three'
 board_show '{"number":43,"state":"OPEN","status":"In progress","labels":["agent: designer"]}'
 CLAUDE_SUBTYPE=success CLAUDE_RC=0 CLAUDE_COST=0.10 CLAUDE_TURNS=2 CLAUDE_DENIALS=0
-export CLAUDE_RESULT=$'Card #43 is not mine to work. Its label is `agent: designer`, so the design lane owns it. Ask @someone.\n\n- Card: #43\n- Outcome: no progress'
+export CLAUDE_RESULT=$'Card #43 is not mine to work. Its label is `agent: designer`, so the design lane owns it. Ask @someone <details>.\n\n- Card: #43\n- Outcome: no progress'
 run --once >/dev/null
 run --once >/dev/null
 unset CLAUDE_RESULT
@@ -833,8 +833,9 @@ if printf '%s' "$park_line" | grep -q 'Why: The run ended on its own without fin
 else
   flunk "park comment has no last words" "$park_line"
 fi
-if ! printf '%s' "$park_line" | grep -q 'Outcome: no progress' && ! printf '%s' "$park_line" | grep -q '@someone'; then
-  pass "…only the first line, and a quoted @mention is broken so it pings nobody"
+if ! printf '%s' "$park_line" | grep -q 'Outcome: no progress' && ! printf '%s' "$park_line" | grep -q '@someone' \
+   && printf '%s' "$park_line" | grep -q '&lt;details>\.'; then
+  pass "…only the first line, a quoted @mention is broken so it pings nobody, and a quoted tag is escaped"
 else
   flunk "park comment quotes too much, or a live @mention" "$park_line"
 fi
