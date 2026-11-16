@@ -690,9 +690,13 @@ that check). The second writes the `env` of `~/.claude/settings.json` — `WATCH
 so `bin/gh-app-token.sh` mints the desk App whatever checkout a session is in (its fallback is
 the git remote, which would pick that project's lane App), the App's identity for commits,
 `bin/shim/gh-credential` as git's credential helper — and removes `GH_CONFIG_DIR`, which named
-the suspended login. It also adds one guarded line to `~/.zshenv` that puts `bin/shim` first on
-`PATH` only when `WATCHER_APP_PROJECT` is set: a Claude session's `gh` is the shim, your own
-terminal's `gh` is untouched. Idempotent; `--dry-run` prints the changes and writes nothing.
+the suspended login. It also adds one guarded line to `~/.zshenv` and, kept last, to
+`~/.zshrc`, that puts `bin/shim` first on `PATH` in a Claude session's shell only: a session's
+`gh` is the shim, your own terminal's `gh` is untouched. Then it asks a fresh shell which `gh`
+it finds, both ways, and exits 1 saying where to look when the answer is wrong (card [#301](https://github.com/lonestarprod/watcher/issues/301): a `~/.zshrc`
+that prepends the real `gh`'s directory, and a guard that was not yet true when the session's
+shell snapshot was built, each had a session writing as the owner). Idempotent; `--dry-run`
+prints the changes and writes nothing.
 A session started after that writes as the App; the one you ran it from keeps its old
 environment until it is restarted. The check: a comment filed from a new session shows as
 `roloc-desk-author[bot]` on the card.
