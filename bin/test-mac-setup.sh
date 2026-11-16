@@ -43,11 +43,13 @@ chmod +x "$FAKE_ZSH"
 # The owner's real gh, where his ~/.zshrc puts it.
 mkdir -p "$HOME_DIR/.local/bin"; printf '#!/bin/sh\necho real gh\n' > "$HOME_DIR/.local/bin/gh"; chmod +x "$HOME_DIR/.local/bin/gh"
 export HOME="$HOME_DIR" MAC_SETUP_SETTINGS="$SETTINGS" MAC_SETUP_ZSHENV="$ZSHENV" MAC_SETUP_ZSHRC="$ZSHRC" MAC_SETUP_ZSH="$FAKE_ZSH" WATCHER_HOME="$ROOT"
-unset GH_APP_DIR WATCHER_APP_PROJECT PROJECT_NAME CLAUDE_CODE_ENTRYPOINT CLAUDECODE ZDOTDIR FAKE_ZSH_LATER
+unset GH_APP_DIR WATCHER_APP_PROJECT PROJECT_NAME CLAUDE_CODE_ENTRYPOINT CLAUDECODE CLAUDE_DESKTOP_RESOLVING_ENVIRONMENT ZDOTDIR FAKE_ZSH_LATER
 # A PATH with the real gh on it and no shim: what a shell has before the profiles run.
 export PATH="$HOME_DIR/.local/bin:$(printf '%s' "$PATH" | tr ':' '\n' | grep -v 'bin/shim$' | paste -sd: -)"
 # which_gh <session|own> — the gh a shell finds after the profiles, started either way.
-which_gh() { if [ "$1" = session ]; then CLAUDE_CODE_ENTRYPOINT=claude-desktop "$FAKE_ZSH" -ic 'command -v gh'; else "$FAKE_ZSH" -ic 'command -v gh'; fi; }
+# `session` is the desktop app's own run: a bare PATH, its marker, none of a session's variables.
+export MAC_SETUP_BARE_PATH="$PATH"
+which_gh() { if [ "$1" = session ]; then CLAUDE_DESKTOP_RESOLVING_ENVIRONMENT=1 "$FAKE_ZSH" -lic 'command -v gh'; else "$FAKE_ZSH" -lic 'command -v gh'; fi; }
 run() { "$SCRIPT" "$@" >"$TMP/out" 2>"$TMP/err"; echo $?; }
 envkey() { python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); print(d.get("env",{}).get(sys.argv[2],"<absent>"))' "$SETTINGS" "$1"; }
 
@@ -96,7 +98,7 @@ check "GH_CONFIG_DIR (the suspended login) is gone" '[ "$(envkey GH_CONFIG_DIR)"
 check "every other key is kept: the plugin dir, permissions, model" '[ "$(envkey CLAUDE_CODE_PLUGIN_DIRS)" = /Users/me/Projects/watcher/mods/owner-pane ] && python3 -c "import json,sys; d=json.load(open(sys.argv[1])); sys.exit(0 if d[\"permissions\"]=={\"allow\":[\"Bash(ls:*)\"]} and d[\"model\"]==\"opus\" else 1)" "$SETTINGS"'
 check "the settings file is still JSON a human can read (indented, one trailing newline)" 'python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$SETTINGS" && [ "$(tail -c1 "$SETTINGS" | od -An -c | tr -d " ")" = "\\n" ] && grep -q "^  \"env\": {" "$SETTINGS"'
 check "the profile keeps its own line and gains the guarded shim line" '[ "$(head -1 "$ZSHENV")" = "export EDITOR=vim" ] && grep -q "bin/shim:\$PATH" "$ZSHENV" && grep -q "WATCHER_APP_PROJECT" "$ZSHENV" && [ "$(wc -l < "$ZSHENV" | tr -d " ")" = 2 ]' "$(cat "$ZSHENV")"
-check "the output says what to expect from the next session" 'grep -q "started from now on writes to GitHub as roloc-desk-author\[bot\]" "$TMP/out"' "$(cat "$TMP/out")"
+check "the output says what to expect from the next session" 'grep -q "A session opened after that writes to GitHub as roloc-desk-author\[bot\]" "$TMP/out"' "$(cat "$TMP/out")"
 
 check "~/.zshrc is made, the one line (card #301)" '[ "$(wc -l < "$ZSHRC" | tr -d " ")" = 1 ] && grep -q "$SHIM_LINE_RE" "$ZSHRC"' "$(cat "$ZSHRC" 2>&1)"
 check "the check ran and says both shells are right" 'grep -q "^check: a Claude session.s shell finds $ROOT/bin/shim/gh: the shim is first" "$TMP/out" && grep -q "^check: your own terminal finds $HOME_DIR/.local/bin/gh: untouched" "$TMP/out"' "$(cat "$TMP/out")"
@@ -110,6 +112,8 @@ check "with WATCHER_APP_PROJECT: bin/shim first" '[ "${P1#$ROOT/bin/shim:}" != "
 check "without any of the three (the owner's own terminal): PATH untouched" '[ "$P2" = "$PATH" ]' "$P2"
 check "with CLAUDE_CODE_ENTRYPOINT and no WATCHER_APP_PROJECT (a session's snapshot shell, card #301): bin/shim first" '[ "${P3#$ROOT/bin/shim:}" != "$P3" ]' "$P3"
 check "with CLAUDECODE alone: bin/shim first" '[ "${P4#$ROOT/bin/shim:}" != "$P4" ]' "$P4"
+P5="$(CLAUDE_DESKTOP_RESOLVING_ENVIRONMENT=1 bash -c "source \"$ZSHENV\"; printf %s \"\$PATH\"")"
+check "with CLAUDE_DESKTOP_RESOLVING_ENVIRONMENT alone (the one shell the desktop app takes PATH from): bin/shim first" '[ "${P5#$ROOT/bin/shim:}" != "$P5" ]' "$P5"
 
 echo "4. a second run changes nothing and says so"
 cp "$SETTINGS" "$TMP/settings.once"; cp "$ZSHENV" "$TMP/zshenv.once"; cp "$ZSHRC" "$TMP/zshrc.once"
@@ -145,7 +149,7 @@ printf '%s\n' "$OLD_LINE" > "$ZSHENV"
 printf 'export PATH="$HOME/.local/bin:$PATH"\nexport NVM_DIR="$HOME/.nvm"\n' > "$ZSHRC"
 check "before: a session's shell finds the real gh — with the App named (the card's symptom) and as a snapshot shell" '[ "$(WATCHER_APP_PROJECT=desk "$FAKE_ZSH" -ic "command -v gh")" = "$HOME_DIR/.local/bin/gh" ] && [ "$(which_gh session)" = "$HOME_DIR/.local/bin/gh" ]' "$(which_gh session)"
 RC="$(run)"
-check "exit 0; both profiles get the new line, and ~/.zshrc keeps its own two lines above it" '[ "$RC" = 0 ] && [ "$(grep -c "the shim line" "$TMP/out")" = 2 ] && [ "$(sed -n 1p "$ZSHRC")" = "export PATH=\"\$HOME/.local/bin:\$PATH\"" ] && [ "$(wc -l < "$ZSHRC" | tr -d " ")" = 3 ] && tail -1 "$ZSHRC" | grep -q "CLAUDE_CODE_ENTRYPOINT.*$SHIM_LINE_RE"' "rc=$RC $(cat "$TMP/out" "$TMP/err" "$ZSHRC")"
+check "exit 0; both profiles get the new line, and ~/.zshrc keeps its own two lines above it" '[ "$RC" = 0 ] && [ "$(grep -c "the shim line" "$TMP/out")" = 2 ] && [ "$(sed -n 1p "$ZSHRC")" = "export PATH=\"\$HOME/.local/bin:\$PATH\"" ] && [ "$(wc -l < "$ZSHRC" | tr -d " ")" = 3 ] && tail -1 "$ZSHRC" | grep -q "CLAUDE_DESKTOP_RESOLVING_ENVIRONMENT.*$SHIM_LINE_RE"' "rc=$RC $(cat "$TMP/out" "$TMP/err" "$ZSHRC")"
 check "after: a session's shell finds the shim, the owner's own terminal the real gh" '[ "$(which_gh session)" = "$ROOT/bin/shim/gh" ] && [ "$(which_gh own)" = "$HOME_DIR/.local/bin/gh" ]' "session=$(which_gh session) own=$(which_gh own)"
 check "the old guard is gone from ~/.zshenv, one line there" '[ "$(grep -c "bin/shim:" "$ZSHENV")" = 1 ] && grep -q "CLAUDE_CODE_ENTRYPOINT" "$ZSHENV"' "$(cat "$ZSHENV")"
 
@@ -162,6 +166,14 @@ check "a dry run says it would move, writes nothing, and does not claim a check"
 RC="$(run)"
 check "exit 0, moved, one line, last; a session finds the shim again" '[ "$RC" = 0 ] && grep -q "the shim line moved to the end" "$TMP/out" && [ "$(grep -c "bin/shim:" "$ZSHRC")" = 1 ] && tail -1 "$ZSHRC" | grep -q "$SHIM_LINE_RE" && [ "$(which_gh session)" = "$ROOT/bin/shim/gh" ]' "rc=$RC $(cat "$ZSHRC")"
 check "a comment or a blank line after it is not a reason to move it" 'printf "\n# trailing note\n" >> "$ZSHRC"; [ "$(run)" = 0 ] && grep -q "^profile: $ZSHRC: unchanged" "$TMP/out"' "$(cat "$TMP/out")"
+
+echo "12b. card #301 again: the line under the three-variable guard of the first fix is replaced — the desktop app sets none of the three"
+printf 'export PATH="$HOME/.local/bin:$PATH"\nif [ -n "${WATCHER_APP_PROJECT:-}${CLAUDE_CODE_ENTRYPOINT:-}${CLAUDECODE:-}" ]; then export PATH="%s/bin/shim:$PATH"; fi  # watcher card #288: a Claude session'"'"'s gh is the App shim\n' "$ROOT" > "$ZSHRC"
+cp "$ZSHRC" "$ZSHENV.tmp"; tail -1 "$ZSHRC" > "$ZSHENV"; rm -f "$ZSHENV.tmp"
+check "before: the app's own run finds the real gh (what a session opened after the first fix still had)" '[ "$(which_gh session)" = "$HOME_DIR/.local/bin/gh" ]' "$(which_gh session)"
+RC="$(run)"
+check "exit 0, both lines replaced, and the app's own run finds the shim" '[ "$RC" = 0 ] && [ "$(grep -c "the shim line replaced" "$TMP/out")" = 2 ] && [ "$(grep -c "bin/shim:" "$ZSHRC")" = 1 ] && [ "$(which_gh session)" = "$ROOT/bin/shim/gh" ] && [ "$(which_gh own)" = "$HOME_DIR/.local/bin/gh" ]' "rc=$RC $(cat "$TMP/out" "$TMP/err") session=$(which_gh session)"
+check "…and it says to quit and reopen the app" 'grep -q "QUIT the Claude app and reopen it" "$TMP/out"' "$(cat "$TMP/out")"
 
 echo "13. the shim is still not first (something after both files reorders PATH): exit 1, loudly, and it says where"
 RC="$(FAKE_ZSH_LATER="$HOME_DIR/.local/bin" run)"

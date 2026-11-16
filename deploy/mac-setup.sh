@@ -29,20 +29,24 @@
 #       - Both files, and LAST in ~/.zshrc: ~/.zshrc runs after ~/.zshenv, so one that prepends
 #         ~/.local/bin (the real gh) or loads nvm puts them ahead of a line that lives only in
 #         ~/.zshenv.
-#       - The guard is WATCHER_APP_PROJECT, CLAUDE_CODE_ENTRYPOINT or CLAUDECODE, any one set.
-#         Claude Code sources these files ONCE, when a session starts, to build a shell
-#         snapshot that ends in a fixed `export PATH=…`; every Bash command then starts from
-#         that snapshot. WATCHER_APP_PROJECT (from the settings file's "env") is in a command's
-#         environment but not yet in the snapshot shell's, so a guard on it alone never fired:
-#         all five snapshots on the owner's Mac, October 29 to November 16, had no bin/shim on
-#         PATH. The desktop app starts a session's process with CLAUDE_CODE_ENTRYPOINT set, so
-#         the snapshot shell has it. With the shim first and no WATCHER_APP_PROJECT the shim
-#         passes straight through to the real gh, so a guard that fires too often costs nothing.
+#       - The guard is any one of four variables set. The one that matters for the desktop app
+#         is CLAUDE_DESKTOP_RESOLVING_ENVIRONMENT: at launch the app runs `$SHELL -l -i -c env`
+#         ONCE, with a bare PATH and that marker set, and every session it starts gets the PATH
+#         that shell printed; Claude Code's own shell snapshot then copies it. None of the
+#         session's own variables exists in that shell, so a guard on WATCHER_APP_PROJECT
+#         (the first shape) or on CLAUDE_CODE_ENTRYPOINT (card #301's first fix, November 16,
+#         2026) never fired: the app was quit and reopened after that fix and a new session
+#         still found ~/.local/bin/gh. WATCHER_APP_PROJECT, CLAUDE_CODE_ENTRYPOINT and
+#         CLAUDECODE stay in the guard for a `claude` started some other way. With the shim
+#         first and no WATCHER_APP_PROJECT the shim passes straight through to the real gh, so
+#         a guard that fires too often costs nothing.
+#       - So a change here reaches a session only after the app is QUIT and reopened.
 #       - A line from before this shape (the first guard, or one added by hand) is replaced.
 #
 # Then it checks the result, not the files, by asking a fresh `zsh -lic 'command -v gh'` twice:
-#   as a session's snapshot shell is started (CLAUDE_CODE_ENTRYPOINT set, WATCHER_APP_PROJECT
-#     not): it must find bin/shim/gh;
+#   as the desktop app starts the shell it takes a session's PATH from (HOME, SHELL, USER, a
+#     bare PATH and CLAUDE_DESKTOP_RESOLVING_ENVIRONMENT=1, nothing else): it must find
+#     bin/shim/gh;
 #   as the owner's own terminal is (none of the three set): it must NOT find the shim.
 # If either is wrong the script exits 1 and, for the first, names the file and line that put the
 # other gh's directory ahead. A dry run with profile changes still to write does not check (the
@@ -137,7 +141,7 @@ else:
 
 # -- .zshenv and .zshrc: the shim first on PATH, only for a session that names an App
 marker = "# watcher card #288: a Claude session's gh is the App shim"
-GUARD = ("WATCHER_APP_PROJECT", "CLAUDE_CODE_ENTRYPOINT", "CLAUDECODE")
+GUARD = ("WATCHER_APP_PROJECT", "CLAUDE_DESKTOP_RESOLVING_ENVIRONMENT", "CLAUDE_CODE_ENTRYPOINT", "CLAUDECODE")
 stmt = 'if [ -n "' + "".join("${%s:-}" % v for v in GUARD) + f'" ]; then export PATH="{home}/bin/shim:$PATH"; fi'
 line = f"{stmt}  {marker}"
 # The statement under any guard and for any checkout, with any comment or none: the first
@@ -206,13 +210,24 @@ def culprit(found):
     return None
 
 
+BARE_PATH = os.environ.get("MAC_SETUP_BARE_PATH", "/usr/bin:/bin:/usr/sbin:/sbin")
+
+
 def which_gh(session):
-    """What `command -v gh` prints in a fresh interactive login zsh (-l: the snapshot shell is
-    one, so ~/.zprofile and ~/.zlogin count too), started the way a session's snapshot shell
-    is (`session`) or the way the owner's own terminal is."""
-    env = {k: v for k, v in os.environ.items() if k not in GUARD}
+    """What `command -v gh` prints in a fresh `zsh -l -i -c`, started the way the desktop app
+    starts the one shell it takes a session's PATH from (`session`), or the way the owner's
+    own terminal is."""
     if session:
-        env["CLAUDE_CODE_ENTRYPOINT"] = "claude-desktop"
+        # Exactly what the desktop app passes the shell it asks (its own code, 2.1.325): HOME,
+        # the app's bare PATH, SHELL, USER, and the marker it sets for that one run.
+        env = {k: os.environ[k] for k in ("HOME", "SHELL", "USER", "ZDOTDIR") if k in os.environ}
+        env.update(PATH=BARE_PATH, CLAUDE_DESKTOP_RESOLVING_ENVIRONMENT="1",
+                   DISABLE_AUTO_UPDATE="true", ZSH_DISABLE_COMPFIX="true")
+        for k in ("MAC_SETUP_ZSHENV", "MAC_SETUP_ZSHRC", "FAKE_ZSH_LATER"):   # the suite's stand-in zsh reads these
+            if k in os.environ:
+                env[k] = os.environ[k]
+    else:
+        env = {k: v for k, v in os.environ.items() if k not in GUARD}
     try:
         r = subprocess.run([zsh, "-lic", "command -v gh"], env=env, stdin=subprocess.DEVNULL,
                            capture_output=True, text=True, timeout=120)
@@ -256,6 +271,6 @@ PY
 if [ "$dry" = 1 ]; then
   echo "mac-setup: dry run done; nothing written"
 else
-  echo "mac-setup: done. A Claude session started from now on writes to GitHub as $name;"
-  echo "  the one you are in keeps its old environment until it is restarted. Your own terminal's gh is unchanged."
+  echo "mac-setup: done. QUIT the Claude app and reopen it: the app reads PATH once, when it starts."
+  echo "  A session opened after that writes to GitHub as $name. Your own terminal's gh is unchanged."
 fi
