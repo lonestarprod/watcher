@@ -568,7 +568,7 @@ In progress or Waiting. `READY_PULL=1` in a project file makes **Ready** a third
 - **Backlog has no exception.** It used to have one — the weekly hygiene sweep's card, filed
   by a GitHub-hosted job whose token could not move a project item, so the lane pulled it
   out of Backlog once. `bin/hygiene-run.sh` (card #196) runs that sweep on the box itself
-  now, with the `watcher` user's own `gh` login, and files the card straight into Ready — so
+  now, as the author App (card #273), and files the card straight into Ready — so
   the exception is gone, and every Backlog card, without exception, is the owner's.
 - **`WIP_MAX` (default 2) is board-wide,** not per lane: it counts every open card in the
   In progress column, because that column *is* the work in flight. A lane stops promoting

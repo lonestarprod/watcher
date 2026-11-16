@@ -29,9 +29,9 @@ gh issue view <n> -R lonestarprod/watcher --json title,state,labels,body,comment
   reviewer Apps (`roloc-<project>-reviewer[bot]`, a verdict filed as a PR review) and, on
   older cards, the machine accounts they replaced (`roloc-watcher-bot`, `roloc-desk`;
   `riffmap-bot` before October 30, 2026). Those are retired: nothing has written as one since
-  November 9, 2026, so a comment from one is history. The rule above is about `roloc` alone. Before October
-  30, 2026, Mac sessions also wrote as `roloc`, so an older `roloc` comment that reads like a
-  write-up may be one of theirs. The boards live in the `lonestarprod` organization, because a
+  November 9, 2026, so a comment from one is history. The rule above is about `roloc` alone.
+  Before October 30, 2026, Mac sessions also wrote as `roloc`, so an older `roloc` comment
+  that reads like a write-up may be one of theirs. The boards live in the `lonestarprod` organization, because a
   GitHub App can reach an organization's Projects board and not a user's; `BOARD_OWNER` is the
   organization and `bin/board.py` reads either kind of owner.
 - **The column** is `projectItems[].status.name` (Backlog, Ready, In progress, In review,

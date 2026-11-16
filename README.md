@@ -477,12 +477,13 @@ script nothing runs, a link to a file that moved — is invisible to CI, which o
 one PR. `bin/hygiene.sh` sweeps for it; `bin/hygiene-run.sh`, off `watcher-hygiene@watcher.timer`
 on the agents box (card #196), runs the sweep every Monday and files **one** card,
 `Weekly hygiene sweep — <date>`, with the report as its body — or files nothing when the
-sweep is clean. It files straight into **Ready** with the `watcher` user's own `gh` login,
-which already reaches the board, so no `BOARD_TOKEN` secret and no Backlog exception are
-needed any more: the week's debt is paid with nobody moving a card. (That login is not the
-author App: the timer runs `bin/hygiene-run.sh` outside a lane, without the `gh` shim on
-its `PATH`, so it uses whatever `gh auth login` the `watcher` user holds — the same as the
-floor page, the detector and the deployer's own check-run read.) While a hygiene card
+sweep is clean. It files straight into **Ready** as the box's author App, which
+already reaches the board, so no `BOARD_TOKEN` secret and no Backlog exception are
+needed any more: the week's debt is paid with nobody moving a card. (The timer runs
+`bin/hygiene-run.sh` outside a lane, and the script puts the `gh` shim on its own `PATH` —
+the same as the floor page, the detector and the deployer's own check-run read, card
+[#273](https://github.com/lonestarprod/watcher/issues/273). A fork with no Apps set up
+uses whatever `gh auth login` its `watcher` user holds.) While a hygiene card
 is open the next sweep comments the fresh list on it instead of filing a second one. The
 same script runs on riffmap ([lonestarprod/riffmap#711](https://github.com/lonestarprod/riffmap/pull/711))
 and riffmap-site ([lonestarprod/riffmap-site#54](https://github.com/lonestarprod/riffmap-site/pull/54)) —
