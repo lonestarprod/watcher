@@ -307,6 +307,12 @@ TERMSCRIPT
     sleep "$CLAUDE_TICK_SLEEP"
   fi
 fi
+# CLAUDE_RESULT (card #302): the tick's closing message, as the real result block carries it.
+if [ -n "${CLAUDE_RESULT:-}" ]; then
+  python3 -c 'import json,sys; print(json.dumps({"subtype":sys.argv[1],"total_cost_usd":float(sys.argv[2]),"num_turns":int(sys.argv[3]),"permission_denials":[],"result":sys.argv[4]}))' \
+    "${CLAUDE_SUBTYPE:-success}" "${CLAUDE_COST:-0.01}" "${CLAUDE_TURNS:-1}" "$CLAUDE_RESULT"
+  exit "${CLAUDE_RC:-0}"
+fi
 printf '{"subtype":"%s","total_cost_usd":%s,"num_turns":%s,"permission_denials":%s}\n' \
   "${CLAUDE_SUBTYPE:-success}" "${CLAUDE_COST:-0.01}" "${CLAUDE_TURNS:-1}" "${CLAUDE_DENIALS:-0}"
 exit "${CLAUDE_RC:-0}"
@@ -808,6 +814,56 @@ else
 fi
 
 # ============================================================================
+
+echo "4d. card #302: a tick that ends on its own twice with the card still In progress — the park comment carries its last words"
+# NullTrader #131, November 16, 2026: the design lane's tick exited success in five seconds,
+# twice, saying the card was not its own; the park said only "The run ended with the card
+# still In progress" and the owner had nothing to choose A, B or C with.
+fresh_state
+board_list $'43\tP1\tdesigner\t-\tCard forty-three'
+board_show '{"number":43,"state":"OPEN","status":"In progress","labels":["agent: designer"]}'
+CLAUDE_SUBTYPE=success CLAUDE_RC=0 CLAUDE_COST=0.10 CLAUDE_TURNS=2 CLAUDE_DENIALS=0
+export CLAUDE_RESULT=$'Card #43 is not mine to work. Its label is `agent: designer`, so the design lane owns it. Ask @someone <details>.\n\n- Card: #43\n- Outcome: no progress'
+run --once >/dev/null
+run --once >/dev/null
+unset CLAUDE_RESULT
+park_line="$(grep 'gh issue comment 43' "$TESTLOG" || true)"
+if printf '%s' "$park_line" | grep -q 'Why: The run ended on its own without finishing the card or moving it\. Its last words: "Card #43 is not mine to work\.'; then
+  pass "the park comment says the run ended on its own and quotes the first line of its result"
+else
+  flunk "park comment has no last words" "$park_line"
+fi
+if ! printf '%s' "$park_line" | grep -q 'Outcome: no progress' && ! printf '%s' "$park_line" | grep -q '@someone' \
+   && printf '%s' "$park_line" | grep -q '&lt;details>\.'; then
+  pass "…only the first line, a quoted @mention is broken so it pings nobody, and a quoted tag is escaped"
+else
+  flunk "park comment quotes too much, or a live @mention" "$park_line"
+fi
+if printf '%s' "$park_line" | grep -q 'Last runs on file: card-43-[0-9TZ]*\.json'; then
+  pass "…and names the runs on file under the fold (a pickup from In progress leaves no comment)"
+else
+  flunk "park comment does not name the runs" "$park_line"
+fi
+if printf '%s' "$park_line" | grep -q 'gh issue comment 43 --body 🤖 \*\*Needs @test-owner:' \
+   && printf '%s' "$park_line" | grep -q 'Reply A, B or C on this card'; then
+  pass "…and keeps the owner's shape: the ask first, A/B/C, how to answer"
+else
+  flunk "park comment shape" "$park_line"
+fi
+
+echo "4e. card #302: a run that used all its turns says so, and one with no result text says it left no last words"
+fresh_state
+board_list $'44\tP1\tbuilder\t-\tCard forty-four'
+board_show '{"number":44,"state":"OPEN","status":"In progress","labels":[]}'
+CLAUDE_SUBTYPE=error_max_turns CLAUDE_RC=1 CLAUDE_COST=0.10 CLAUDE_TURNS=400 CLAUDE_DENIALS=0
+run --once >/dev/null
+run --once >/dev/null
+if grep -q 'gh issue comment 44.*Why: The run used all 400 turns without finishing\. It left no last words\.' "$TESTLOG"; then
+  pass "error_max_turns → 'used all 400 turns', and no quote is invented"
+else
+  flunk "park reason for error_max_turns" "$(grep 'gh issue comment 44' "$TESTLOG")"
+fi
+
 echo "5. pidfile guard refuses a second instance"
 fresh_state
 sleep 5 </dev/null >/dev/null 2>&1 & LIVEPID=$!; disown "$LIVEPID" 2>/dev/null || true
@@ -2559,6 +2615,13 @@ if printf '%s' "$OUT" | grep -q -- '--plugin-dir "'"$(dirname "$HERE")"'/mods/br
   pass "…and the browse mod (card #215) is a third --plugin-dir"
 else
   flunk "no --plugin-dir <WATCHER_HOME>/mods/browse in the launch" "out=[$OUT]"
+fi
+LANE_OUT="$(LANE_AGENTS=architect,builder run --dry-run 2>/dev/null)"
+if printf '%s' "$OUT" | grep -q 'WATCHER_LANE="repo" WATCHER_LANE_AGENTS=""' \
+   && printf '%s' "$LANE_OUT" | grep -q 'WATCHER_LANE="repo" WATCHER_LANE_AGENTS="architect,builder"'; then
+  pass "…and the lane is exported to the tick: its name, and the agent labels it takes (card #302)"
+else
+  flunk "no WATCHER_LANE / WATCHER_LANE_AGENTS in the launch" "out=[$OUT] lane=[$LANE_OUT]"
 fi
 if printf '%s' "$OUT" | grep -q 'WATCHER_CARD="12"'; then
   pass "…and WATCHER_CARD=12 is exported to the tick (a triage tick has no card branch; card #213)"
