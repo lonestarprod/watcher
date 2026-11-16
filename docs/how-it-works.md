@@ -322,6 +322,15 @@ lanes never want the same card, so they never race for one, and the `in-flight` 
 goes on doing the courtesy job it always did. A project with no `LANE_AGENTS` is one lane
 that takes every card — nothing about it changed.
 
+**A tick is told its lane.** The launch line is the same for every lane, so the spawner
+exports `WATCHER_LANE` (the instance's name) and `WATCHER_LANE_AGENTS` (its `LANE_AGENTS`) to
+the tick, and `mods/card-context` puts both under the card's title in the tick's system
+prompt: the card it was launched for is its own, whatever an earlier routing comment says
+about "the design lane". (Card [#302](https://github.com/lonestarprod/watcher/issues/302),
+November 16, 2026: a design lane's tick read the build lane's "routed to the designer"
+comment, took itself for the build lane and left the card untouched, twice, so the spawner
+parked it.)
+
 A lane's project file can also set **`LANE_COMMAND`** (the slash command its tick runs,
 default `/watch`) and **`LANE_WORKDIR`** (`card`, the default, runs the tick in a worktree
 made for the card; `root` runs it in the main checkout with no worktree). The triage lane
@@ -664,6 +673,13 @@ money they had been charged (September 19, 2026). The number was never a bill.
 | In progress, with THIS lane's label (or none) | removed | no progress; attempts +1; at 2 the spawner parks it |
 | In progress, with ANOTHER lane's label | removed | success: the tick relabeled it for that lane (a triage, or `/watch` routing a design card); attempts reset, the other lane starts its own count |
 | any | still there | the tick died; the spawner unclaims, comments, attempts +1 |
+
+**The park comment says how the run stopped** (card
+[#302](https://github.com/lonestarprod/watcher/issues/302)): from the result's subtype, in
+plain words ("ended on its own", "used all 400 turns"), and for a run that ended on its own
+the first line of its own closing message, capped at 300 characters. The last two logs for
+the card are named under the fold, because a pickup from In progress posts no comment and a
+tick that never claimed leaves none either.
 
 `claude -p` result subtypes the spawner reads: `success`; `error_max_turns`;
 `error_max_budget_usd`; `error_during_execution`; a killed tick shows exit 143.
