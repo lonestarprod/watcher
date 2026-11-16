@@ -26,9 +26,10 @@ gh issue view <n> -R lonestarprod/watcher --json title,state,labels,body,comment
   author Apps (`roloc-<project>-author[bot]`, the lane), the desk App
   (`roloc-desk-author[bot]`, the owner's own Mac sessions acting on his word, card
   [#288](https://github.com/lonestarprod/watcher/issues/288)), the
-  reviewer Apps (`roloc-<project>-reviewer[bot]`, a verdict filed as a PR review) and, until
-  they are decommissioned, the machine accounts they replace (`roloc-watcher-bot`, `roloc-desk`;
-  `riffmap-bot` before October 30, 2026). The rule above is about `roloc` alone. Before October
+  reviewer Apps (`roloc-<project>-reviewer[bot]`, a verdict filed as a PR review) and, on
+  older cards, the machine accounts they replaced (`roloc-watcher-bot`, `roloc-desk`;
+  `riffmap-bot` before October 30, 2026). Those are retired: nothing has written as one since
+  November 9, 2026, so a comment from one is history. The rule above is about `roloc` alone. Before October
   30, 2026, Mac sessions also wrote as `roloc`, so an older `roloc` comment that reads like a
   write-up may be one of theirs. The boards live in the `lonestarprod` organization, because a
   GitHub App can reach an organization's Projects board and not a user's; `BOARD_OWNER` is the

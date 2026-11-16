@@ -43,6 +43,9 @@ gh issue view <n> -R <owner/repo> --json title,state,labels,body,comments,projec
   (`…-<project>-reviewer[bot]`). The owner's own desktop sessions write as the desk App
   (`…-desk-author[bot]`, one App for every project; README, "The Mac's own App"), never as
   `<owner login>` and never as a lane's App, so nobody mistakes one for the other.
+  A machine account (one bot login shared by a lane or a session) acts here only on a
+  project that never set up the Apps. On a project that moved to them it is retired, and a
+  comment from it on an older card is history, the same as any other report.
 - **The column** is `projectItems[].status.name` (Backlog, Ready, In progress, In review,
   Done, Stuck - Needs help). A card with no `projectItems` is an issue nobody put on the
   board; see "Filing".

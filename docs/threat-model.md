@@ -16,10 +16,12 @@ what actually stops a bad PR from merging.
   Tokens are minted per call and last an hour; none is stored. Nothing on your own personal
   account. (A fork on one bot account instead: a `gh auth login` for that bot, run once as the
   `watcher` user — write access to whatever repo you granted it, and the board. On the
-  watcher's own box that login is still there too, for the readers that run outside a lane
-  and so without the `gh` shim — the floor page, the hygiene timer, the detector and the
-  deployer's check-run read — until the machine account is retired, card
-  [#255](https://github.com/lonestarprod/watcher/issues/255)'s last step.)
+  watcher's own box the old bot's login is still stored for the `watcher` user, and nothing
+  uses it: the readers that run outside a lane — the floor page, the hygiene timer, the
+  detector and the deployer's check-run read — moved to the author App with
+  [#273](https://github.com/lonestarprod/watcher/issues/273). The machine accounts are
+  retired, card [#255](https://github.com/lonestarprod/watcher/issues/255); removing that
+  stored login and the bot's seat in the organization is the clean-up left.)
 - A Claude **subscription** token, `CLAUDE_CODE_OAUTH_TOKEN` in `/etc/watcher/env` — never
   an API key; that file is never allowed to carry `ANTHROPIC_API_KEY`, because the key
   would outrank the login and bill your API account instead of spending the subscription's
