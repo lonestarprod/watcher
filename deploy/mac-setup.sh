@@ -40,7 +40,7 @@
 #         passes straight through to the real gh, so a guard that fires too often costs nothing.
 #       - A line from before this shape (the first guard, or one added by hand) is replaced.
 #
-# Then it checks the result, not the files, by asking a fresh `zsh -ic 'command -v gh'` twice:
+# Then it checks the result, not the files, by asking a fresh `zsh -lic 'command -v gh'` twice:
 #   as a session's snapshot shell is started (CLAUDE_CODE_ENTRYPOINT set, WATCHER_APP_PROJECT
 #     not): it must find bin/shim/gh;
 #   as the owner's own terminal is (none of the three set): it must NOT find the shim.
@@ -180,8 +180,9 @@ zsh = os.environ.get("MAC_SETUP_ZSH") or shutil.which("zsh")
 
 
 def culprit(found):
-    """The first line, after the shim line, of either profile that names the directory the
-    wrong gh is in — spelled out, or with $HOME, ${HOME} or ~."""
+    """A line of either profile that names the directory the wrong gh is in — spelled out,
+    or with $HOME, ${HOME} or ~. One after the shim line is what got ahead of it. One before
+    it cannot be, on its own: said as a lead, with where else to look."""
     d = os.path.dirname(found)
     h = os.environ.get("HOME", "")
     names = {d}
@@ -194,20 +195,26 @@ def culprit(found):
         except OSError:
             continue
         start = max([i for i, l in enumerate(lines) if shape.match(l)] or [-1])
-        for i in list(range(start + 1, len(lines))) + list(range(0, max(start, 0))):
+        for i in range(start + 1, len(lines)):
             if any(n in lines[i] for n in names) and not lines[i].strip().startswith("#"):
-                return f"{path} line {i + 1} puts {d} on PATH: {lines[i].strip()}"
+                return f"{path} line {i + 1}, after the shim line, puts {d} on PATH: {lines[i].strip()}"
+        for i in range(0, max(start, 0)):
+            if any(n in lines[i] for n in names) and not lines[i].strip().startswith("#"):
+                return (f"{path} line {i + 1} names {d} ({lines[i].strip()}), but it runs before the shim line:\n"
+                        "  something later puts that directory ahead again — a file the profiles source,\n"
+                        "  ~/.zprofile or ~/.zlogin, or ZDOTDIR pointing at other profiles.")
     return None
 
 
 def which_gh(session):
-    """What `command -v gh` prints in a fresh interactive zsh, started the way a session's
-    snapshot shell is (`session`) or the way the owner's own terminal is."""
+    """What `command -v gh` prints in a fresh interactive login zsh (-l: the snapshot shell is
+    one, so ~/.zprofile and ~/.zlogin count too), started the way a session's snapshot shell
+    is (`session`) or the way the owner's own terminal is."""
     env = {k: v for k, v in os.environ.items() if k not in GUARD}
     if session:
         env["CLAUDE_CODE_ENTRYPOINT"] = "claude-desktop"
     try:
-        r = subprocess.run([zsh, "-ic", "command -v gh"], env=env, stdin=subprocess.DEVNULL,
+        r = subprocess.run([zsh, "-lic", "command -v gh"], env=env, stdin=subprocess.DEVNULL,
                            capture_output=True, text=True, timeout=120)
     except (OSError, subprocess.TimeoutExpired) as e:
         sys.exit(f"mac-setup: could not ask a fresh zsh which gh it finds ({e})")

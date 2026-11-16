@@ -693,8 +693,7 @@ the git remote, which would pick that project's lane App), the App's identity fo
 the suspended login. It also adds one guarded line to `~/.zshenv` and, kept last, to
 `~/.zshrc`, that puts `bin/shim` first on `PATH` in a Claude session's shell only: a session's
 `gh` is the shim, your own terminal's `gh` is untouched. Then it asks a fresh shell which `gh`
-it finds, both ways, and exits 1 saying which file and line got ahead of the shim when the
-answer is wrong (card [#301](https://github.com/lonestarprod/watcher/issues/301): a `~/.zshrc`
+it finds, both ways, and exits 1 saying where to look when the answer is wrong (card [#301](https://github.com/lonestarprod/watcher/issues/301): a `~/.zshrc`
 that prepends the real `gh`'s directory, and a guard that was not yet true when the session's
 shell snapshot was built, each had a session writing as the owner). Idempotent; `--dry-run`
 prints the changes and writes nothing.

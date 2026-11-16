@@ -166,7 +166,7 @@ check "a comment or a blank line after it is not a reason to move it" 'printf "\
 echo "13. the shim is still not first (something after both files reorders PATH): exit 1, loudly, and it says where"
 RC="$(FAKE_ZSH_LATER="$HOME_DIR/.local/bin" run)"
 check "exit 1, THE SHIM IS NOT FIRST, the gh it found, and what that means" '[ "$RC" = 1 ] && grep -q "THE SHIM IS NOT FIRST" "$TMP/err" && grep -q "gh is $HOME_DIR/.local/bin/gh" "$TMP/err" && grep -q "write to GitHub as you" "$TMP/err"' "rc=$RC $(cat "$TMP/err")"
-check "…and names the file and line that put that directory on PATH" 'grep -q "$ZSHRC line 1 puts $HOME_DIR/.local/bin on PATH" "$TMP/err"' "$(cat "$TMP/err")"
+check "…and names the line that mentions that directory, without blaming it: it runs before the shim line" 'grep -q "$ZSHRC line 1 names $HOME_DIR/.local/bin" "$TMP/err" && grep -q "runs before the shim line" "$TMP/err" && grep -q "zlogin" "$TMP/err"' "$(cat "$TMP/err")"
 check "a dry run with nothing left to write fails the same way: it is the state that is wrong" '[ "$(FAKE_ZSH_LATER="$HOME_DIR/.local/bin" run --dry-run)" = 1 ] && grep -q "THE SHIM IS NOT FIRST" "$TMP/err"' "$(cat "$TMP/err")"
 cp "$ZSHRC" "$TMP/zshrc.good"
 { sed -n '1,2p' "$TMP/zshrc.good"; printf 'export PATH="%s/bin/shim:$PATH"\n' "$ROOT"; sed -n '3,$p' "$TMP/zshrc.good"; } > "$ZSHRC"
