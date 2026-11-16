@@ -38,7 +38,7 @@ one machine account per person; the owner had three, and GitHub suspended one of
 | `roloc-<project>-author[bot]` | the lane and its ticks (`bin/shim/gh`, `bin/shim/gh-credential`, a token minted per call by `bin/gh-app-token.sh` from `/etc/watcher/apps/<project>/author.pem`) | pushes, opens PRs, comments, moves cards. Commits are authored as this bot |
 | `roloc-desk-author[bot]` | the owner's own Claude sessions on the Mac (card [#288](https://github.com/lonestarprod/watcher/issues/288)): one App for every project, its key under `~/.config/roloc-apps/desk/`, chosen by `WATCHER_APP_PROJECT=desk` in the Mac's Claude settings so the checkout's git remote never picks a lane's App instead; `deploy/mac-setup.sh` writes that, puts the shim first on `PATH` in a Claude session's shell only (one guarded line in `~/.zshenv` and, last, in `~/.zshrc`; card [#301](https://github.com/lonestarprod/watcher/issues/301)), and checks it by asking a fresh shell which `gh` it finds, so the owner's own terminal `gh` is untouched | files cards, comments, moves cards and opens PRs on the owner's word. A write from a Mac session is this bot, so it is never the owner's answer: a Stuck question or an A/B decision is answered by `roloc` alone |
 | `roloc-<project>-reviewer[bot]` | `bin/review-submit.sh`, run as the separate `watcher-reviewer` system user, the only one that can read `reviewer.pem`; called only by the guard mod's receipts hook | files the `reviewer` subagent's verdict as a real PR review — Approve or Request changes — on the PR's exact head commit. A stale SHA is refused |
-| `roloc-watcher-bot`, `roloc-desk`, `Roloc59-Barf` | machine accounts, being retired: the last step of [#255](https://github.com/lonestarprod/watcher/issues/255), after the appeal, once [#273](https://github.com/lonestarprod/watcher/issues/273) has moved the box's out-of-lane readers onto the App. Until then the `watcher` user's own `gh` login is still what the floor page, the hygiene timer, the detector and the deployer's check-run read use: they run outside a lane, without the shim | nothing new from a lane. An older card, PR or comment from one of them is a report or a proposal, never the owner's answer |
+| `roloc-watcher-bot`, `roloc-desk`, `Roloc59-Barf` | machine accounts, retired (the last step of [#255](https://github.com/lonestarprod/watcher/issues/255); [#273](https://github.com/lonestarprod/watcher/issues/273) moved the box's out-of-lane readers onto the author App). Nothing has been written as `roloc-watcher-bot` since November 9, 2026, and `roloc-desk` no longer exists on GitHub | nothing new from a lane. An older card, PR or comment from one of them is a report or a proposal, never the owner's answer |
 
 A GitHub App cannot reach a user-owned Projects board — only an organization-level Projects
 permission exists — so the repo and the board live in the `lonestarprod` organization:
@@ -321,6 +321,15 @@ belong to two lanes**. That is what makes the pidfile-per-instance enough of a l
 lanes never want the same card, so they never race for one, and the `in-flight` label
 goes on doing the courtesy job it always did. A project with no `LANE_AGENTS` is one lane
 that takes every card — nothing about it changed.
+
+**A tick is told its lane.** The launch line is the same for every lane, so the spawner
+exports `WATCHER_LANE` (the instance's name) and `WATCHER_LANE_AGENTS` (its `LANE_AGENTS`) to
+the tick, and `mods/card-context` puts both under the card's title in the tick's system
+prompt: the card it was launched for is its own, whatever an earlier routing comment says
+about "the design lane". (Card [#302](https://github.com/lonestarprod/watcher/issues/302),
+November 16, 2026: a design lane's tick read the build lane's "routed to the designer"
+comment, took itself for the build lane and left the card untouched, twice, so the spawner
+parked it.)
 
 A lane's project file can also set **`LANE_COMMAND`** (the slash command its tick runs,
 default `/watch`) and **`LANE_WORKDIR`** (`card`, the default, runs the tick in a worktree
@@ -664,6 +673,13 @@ money they had been charged (September 19, 2026). The number was never a bill.
 | In progress, with THIS lane's label (or none) | removed | no progress; attempts +1; at 2 the spawner parks it |
 | In progress, with ANOTHER lane's label | removed | success: the tick relabeled it for that lane (a triage, or `/watch` routing a design card); attempts reset, the other lane starts its own count |
 | any | still there | the tick died; the spawner unclaims, comments, attempts +1 |
+
+**The park comment says how the run stopped** (card
+[#302](https://github.com/lonestarprod/watcher/issues/302)): from the result's subtype, in
+plain words ("ended on its own", "used all 400 turns"), and for a run that ended on its own
+the first line of its own closing message, capped at 300 characters. The last two logs for
+the card are named under the fold, because a pickup from In progress posts no comment and a
+tick that never claimed leaves none either.
 
 `claude -p` result subtypes the spawner reads: `success`; `error_max_turns`;
 `error_max_budget_usd`; `error_during_execution`; a killed tick shows exit 143.

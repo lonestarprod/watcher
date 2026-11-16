@@ -1,7 +1,7 @@
 // Card #213: the card-context mod — `claude plugin test mods/card-context`, offline. `process.run`
 // is answered from memory (a fixture `gh`), and every command it was asked is kept.
 import { expect, mock, test } from 'claude-code/testing'
-import { cardFromPrompt, cardSection, HEADING } from './register'
+import { cardFromPrompt, cardSection, HEADING, laneLines } from './register'
 
 type On = Parameters<Parameters<typeof test>[1] extends (...a: infer A) => unknown ? (...a: A) => unknown : never>[1]
 
@@ -87,4 +87,28 @@ test('a triage tick (project root, branch main) gets its card from WATCHER_CARD'
   const { sections } = await $.prompt.compose(INPUT)
   expect(ran).toEqual(['gh issue view 778 --json title,body,comments'])
   expect(sections.map((s) => s.id)).toEqual(['core', 'card-context:card'])
+})
+
+// Card #302 (NullTrader #131, November 16, 2026): the design lane's tick took itself for the
+// build lane because nothing it read said which lane it was.
+test('the lane that launched the tick is named under the title, before the comments', async ($, on) => {
+  const ran = engine(on, () => ({ exitCode: 0, stdout: JSON.stringify(ISSUE) }), 'card-213', {
+    WATCHER_LANE: 'fixture-design',
+    WATCHER_LANE_AGENTS: 'architect,designer',
+  })
+  const { sections } = await $.prompt.compose(INPUT)
+  expect(ran).toEqual(['gh issue view 213 --json title,body,comments'])
+  const text = sections[sections.length - 1].text
+  expect(text).toContain('from the lane `fixture-design`, which takes the agent labels `architect,designer`')
+  expect(text).toContain("The card is this tick's own to handle.")
+  expect(text.indexOf('fixture-design')).toBeLessThan(text.indexOf('Please just send the test mail'))
+})
+
+test('no lane in the environment: the section says nothing about one', async ($, on) => {
+  engine(on, () => ({ exitCode: 0, stdout: JSON.stringify(ISSUE) }))
+  const { sections } = await $.prompt.compose(INPUT)
+  expect(sections[sections.length - 1].text).not.toContain('The spawner launched this tick')
+  expect(laneLines('7', '  ', 'designer')).toEqual([])
+  expect(laneLines('7', 'solo', '')[0]).toContain('from the lane `solo`, which takes every card')
+  expect(laneLines('7', 'fixture-triage', '-')[0]).toContain('which takes the cards with no `agent:` label')
 })

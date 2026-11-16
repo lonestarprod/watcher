@@ -10,7 +10,9 @@
 //                    its prompt before its first prompt is submitted): `gh issue view <n> --json
 //                    title,body,comments` (REST, one call per render, nothing against the GraphQL
 //                    budget of card #114), appended as ONE `session` section, last: the title, the
-//                    body, then the comments newest first.
+//                    body, then the comments newest first. Under the title, when bin/spawn.sh
+//                    passed it (card #302): which lane launched the tick, and that the card is
+//                    this tick's own.
 //
 // MEASURED on claude 2.1.312 under `claude -p` (October 30, 2026): the engine renders the system
 // prompt ONCE, at startup, and reuses it for every request of the tick, however many tool turns
@@ -44,12 +46,28 @@ type Comment = { author?: { login?: string } | null; createdAt?: string; body?: 
 type Issue = { title?: string; body?: string; comments?: Comment[] }
 
 // The section's text. Comments newest first (by createdAt; the list's own order breaks ties).
-export function cardSection(n: string, issue: Issue): string {
+// The lane that launched this tick (card #302), as bin/spawn.sh exports it: WATCHER_LANE is the
+// lane's name, WATCHER_LANE_AGENTS the `agent:` labels it takes (empty: every card). NullTrader
+// #131 (November 16, 2026): a design lane's tick read the build lane's "routed to the designer"
+// comment, took itself for the build lane, and left the card for a lane that was itself. With
+// no lane in the environment (a session by hand, an older spawner) the section says nothing.
+export function laneLines(n: string, lane?: string, agents?: string): string[] {
+  const name = lane?.trim()
+  if (!name) return []
+  const takes = agents?.trim()
+  return [
+    `The spawner launched this tick for card #${n} from the lane \`${name}\`${takes === '-' ? ', which takes the cards with no `agent:` label' : takes ? `, which takes the agent labels \`${takes}\`` : ', which takes every card'}.`,
+    'The card is this tick\'s own to handle. A comment below that says it was routed to another lane is describing this tick; no other lane will pick it up.',
+    '',
+  ]
+}
+
+export function cardSection(n: string, issue: Issue, lane: string[] = []): string {
   const comments = (issue.comments ?? [])
     .map((c, i) => ({ c, i }))
     .sort((a, b) => (b.c.createdAt ?? '').localeCompare(a.c.createdAt ?? '') || b.i - a.i)
     .map(({ c }) => c)
-  const out = [`# ${HEADING}`, '', `Card #${n}: ${issue.title ?? ''}`, '']
+  const out = [`# ${HEADING}`, '', `Card #${n}: ${issue.title ?? ''}`, '', ...lane]
   if (comments.length) {
     out.push('## Comments, newest first', '')
     for (const c of comments) {
@@ -95,7 +113,8 @@ export const register: Register = (on) => {
       const n = await cardNumber($)
       if (!n) return base
       card = n
-      const text = cardSection(n, await read($, n))
+      const lane = laneLines(n, await $.env.get('WATCHER_LANE'), await $.env.get('WATCHER_LANE_AGENTS'))
+      const text = cardSection(n, await read($, n), lane)
       return { ...base, sections: [...base.sections, { id: `${NAME}:card`, text, scope: 'session' as const }] }
     } catch (err) {
       warn(err)
