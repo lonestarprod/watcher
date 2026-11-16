@@ -201,7 +201,7 @@ A headless Claude Code loop that turns a GitHub Projects board into merged PRs. 
   `bash bin/test-check-old-owner.sh` is its offline suite (CI runs both).
 - `bin/hygiene.sh` — the weekly debt sweep. `bin/hygiene-run.sh` runs it on the agents box
   itself (`watcher-hygiene@watcher.timer`, card #196 — no GitHub Actions and no
-  `BOARD_TOKEN`, since the bot's own `gh` login already reaches the board), Monday
+  `BOARD_TOKEN`, since the box's author App already reaches the board, card #273), Monday
   mornings, and files one card straight into Ready when it finds something, nothing when
   it does not. A hygiene card is mechanical only: clear the sections it lists and nothing
   else, delete a branch with `gh api -X DELETE …/git/refs/heads/<branch>` and list it in a
